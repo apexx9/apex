@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { isTauri } from "@tauri-apps/api/core";
 import Editor from "@monaco-editor/react";
 import { TerminalPanel } from "@/frontend/components/TerminalPanel";
 import {
@@ -37,10 +39,10 @@ export default function Home() {
 
   return (
     <main className="ide">
-      <header className="titlebar">
+      <header className="titlebar" data-tauri-drag-region>
         <div className="brand"><div className="brand-mark">A</div><span>APEX</span><span className="brand-sub">EMBEDDED STUDIO</span></div>
         <div className="project-title"><Folder size={14}/> esp32-blink <ChevronDown size={13}/></div>
-        <div className="title-actions"><span className="connection"><span/> No device connected</span><button aria-label="Minimize">—</button><button aria-label="Maximize">□</button><button aria-label="Close">×</button></div>
+        <div className="title-actions"><span className="connection"><span/> No device connected</span><button aria-label="Minimize" onClick={() => isTauri() && void getCurrentWindow().minimize()}>—</button><button aria-label="Maximize" onClick={() => isTauri() && void getCurrentWindow().toggleMaximize()}>□</button><button aria-label="Close" onClick={() => isTauri() && void getCurrentWindow().close()}>×</button></div>
       </header>
       <div className="workspace">
         <nav className="activity">
@@ -76,7 +78,7 @@ export default function Home() {
           </div>
         </section>
       </div>
-      <footer className="statusbar"><div><GitBranch size={13}/> main <span>●</span> 0 errors</div><div><Usb size={13}/> No serial port <span>UTF-8</span><span>CRLF</span><span>C++</span><Activity size={13}/> Ready</div></footer>
+      <footer className="statusbar"><div><GitBranch size={13}/> main <span>●</span> Workspace</div><div><Usb size={13}/> No serial port <span>UTF-8</span><span>CRLF</span><span>C++</span><Activity size={13}/> Ready</div></footer>
       {showWelcome && <div className="welcome-toast"><div className="welcome-icon"><AppWindow size={18}/></div><div><strong>Welcome to APEX</strong><p>Your embedded development workspace is taking shape.</p></div><button onClick={() => setShowWelcome(false)} aria-label="Dismiss"><X size={14}/></button></div>}
     </main>
   );
