@@ -66,13 +66,27 @@ fn run_in_project(root: &Path, program: &str, args: &[String]) -> Result<Firmwar
     })
 }
 
-fn active_project(manager: &WorkspaceManager) -> Result<PathBuf,String> {
-    manager.root()
+fn active_project(manager: &WorkspaceManager, framework: &str) -> Result<PathBuf,String> {
+    let root=manager.root()?;
+    match framework {
+        "arduino" => {
+            let has_sketch=fs::read_dir(&root).map_err(|e| format!("Could not inspect Arduino project: {e}"))?
+                .filter_map(Result::ok).any(|entry| entry.path().extension().is_some_and(|ext| ext.eq_ignore_ascii_case("ino")));
+            if !has_sketch { return Err("The active workspace does not contain an Arduino .ino sketch. Select the matching framework or open an Arduino project.".into()); }
+        },
+        "esp-idf" => {
+            if !root.join("CMakeLists.txt").is_file() || !root.join("main").is_dir() {
+                return Err("The active workspace does not look like an ESP-IDF project (expected CMakeLists.txt and main/).".into());
+            }
+        },
+        _ => return Err("Unsupported framework".into())
+    }
+    Ok(root)
 }
 
 #[tauri::command]
 pub fn firmware_build(manager: State<'_,WorkspaceManager>, framework: String) -> Result<FirmwareResult,String> {
-    let root=active_project(&manager)?;
+    let root=active_project(&manager, &framework)?;
     match framework.as_str() {
         "arduino" => run_in_project(&root,"arduino-cli",&["compile".into(),"--fqbn".into(),"esp32:esp32:esp32".into(),".".into()]),
         "esp-idf" => run_in_project(&root,"idf.py",&["build".into()]),
@@ -87,7 +101,7 @@ pub fn firmware_flash(manager: State<'_,WorkspaceManager>, framework: String, po
     }
     let root=active_project(&manager)?;
     match framework.as_str() {
-        "arduino" => run_in_project(&root,"arduino-cli",&["upload".into(),"--fqbn".into(),"esp32:esp32:esp32".into(),"-p".into(),port,".".into()]),
+        "arduino" => run_in_project(&root,"arduino-cli",&["compile".into(),"--fqbn".into(),"esp32:esp32:esp32".into(),"--upload".into(),"--port".into(),port,".".into()]),
         "esp-idf" => run_in_project(&root,"idf.py",&["-p".into(),port,"flash".into()]),
         _ => Err("Unsupported framework".into())
     }

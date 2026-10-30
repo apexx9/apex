@@ -21,7 +21,7 @@ APEX is a native desktop engineering environment for embedded firmware, robotics
 - The generic ESP32 template targets `esp32` / `esp32:esp32:esp32`. The sample GPIO 2 LED pin is illustrative and must be checked against the actual board.
 - Build and flash require the selected framework's toolchain installed and initialized in the environment from which APEX is launched.
 - APEX does not yet automatically install ESP-IDF or Arduino cores.
-- Peripheral configuration, pin-conflict analysis, live GPIO/I2C/SPI diagnostics, OpenOCD/GDB session management and component registry UI are still under development.
+- Peripheral configuration, pin-conflict analysis, live GPIO/I2C/SPI diagnostics and OpenOCD/GDB session management are still under development. The component panel currently supports Arduino CLI library search/install and ESP-IDF dependency addition; full registry browsing and PlatformIO integration remain pending.
 - No physical board has been validated as part of CI. The first hardware acceptance pass must be performed with a real ESP32 connected.
 
 ## Architecture

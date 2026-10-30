@@ -73,6 +73,7 @@ export default function Home() {
   const [newEntryName, setNewEntryName] = useState("");
   const createProject = async () => {
     if (!isTauri()) return;
+    if (dirty && !window.confirm("Discard unsaved changes and create a new project?")) return;
     const name = window.prompt("Project name (letters, numbers, hyphens and underscores):", "esp32-project");
     if (!name) return;
     const selected = window.prompt("Framework: enter arduino or esp-idf", framework);

@@ -64,7 +64,7 @@ The following requires a real board and is intentionally not claimed as CI-verif
 - Automatic installation and environment management for ESP-IDF, Arduino cores and compiler toolchains.
 - Board-specific verified pinout database, GPIO/peripheral configuration and pin conflict detection.
 - Firmware-assisted I2C scan, SPI/UART/I2S/PWM/ADC/DAC/CAN diagnostics.
-- Component/library registry search and installation UI.
+- Full registry browsing and PlatformIO integration; current component panel provides Arduino CLI library search/install and ESP-IDF dependency addition.
 - OpenOCD/GDB debug sessions and breakpoint controls.
 - Automated hardware-in-the-loop testing.
 
