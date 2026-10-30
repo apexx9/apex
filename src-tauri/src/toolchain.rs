@@ -18,7 +18,8 @@ fn locate(executable: &str) -> Option<PathBuf> {
     if !output.status.success() {
         return None;
     }
-    let path = String::from_utf8_lossy(&output.stdout)
+    let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
+    let path = stdout
         .lines()
         .map(str::trim)
         .find(|line| !line.is_empty())?;
