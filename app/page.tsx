@@ -165,7 +165,12 @@ export default function Home() {
   const refreshPorts = async () => {
     if (!isTauri()) { setPortsError("Serial discovery requires the APEX desktop runtime."); return; }
     setPortsLoading(true); setPortsError("");
-    try { setPorts(await invoke<SerialPort[]>("serial_list_ports")); }
+    try {
+      const nextPorts = await invoke<SerialPort[]>("serial_list_ports");
+      setPorts(nextPorts);
+      // Do not leave a removed COM port selected as a possible flash target.
+      setSelectedPort((current) => current && !nextPorts.some((port) => port.name === current) ? "" : current);
+    }
     catch (error) { setPortsError(error instanceof Error ? error.message : String(error)); }
     finally { setPortsLoading(false); }
   };
