@@ -10,9 +10,9 @@ export function DebugPanel(){
  const start=async()=>{if(!isTauri())return;setBusy(true);setOutput("Starting OpenOCD…");try{const msg=await invoke<string>("debug_openocd_start",{interfaceConfig:iface,targetConfig:target});setOutput(msg);setRunning(true)}catch(e){setOutput(String(e))}finally{setBusy(false)}};
  const stop=async()=>{try{await invoke("debug_openocd_stop");setRunning(false);setOutput(x=>x+"\nOpenOCD stopped.")}catch(e){setOutput(String(e))}};
  const probe=async()=>{try{setVersion(await invoke<string>("debug_gdb_probe",{executable:gdb}))}catch(e){setVersion(String(e))}};
- const startGdb=async()=>{try{setOutput(x=>x+"\\nStarting GDB MI2…");const msg=await invoke<string>("debug_gdb_start",{executable:gdb,elfPath:elf});setOutput(x=>x+"\\n"+msg);setGdbRunning(true)}catch(e){setOutput(x=>x+"\\n"+String(e))}};
- const sendGdb=async()=>{try{await invoke("debug_gdb_command",{command:gdbInput});setGdbInput("")}catch(e){setOutput(x=>x+"\\n"+String(e))}};
- const stopGdb=async()=>{try{await invoke("debug_gdb_stop");setGdbRunning(false);setOutput(x=>x+"\\nGDB stopped.")}catch(e){setOutput(x=>x+"\\n"+String(e))}};
+ const startGdb=async()=>{try{setOutput(x=>x+"\nStarting GDB MI2…");const msg=await invoke<string>("debug_gdb_start",{executable:gdb,elfPath:elf});setOutput(x=>x+"\n"+msg);setGdbRunning(true)}catch(e){setOutput(x=>x+"\n"+String(e))}};
+ const sendGdb=async()=>{try{await invoke("debug_gdb_command",{command:gdbInput});setGdbInput("")}catch(e){setOutput(x=>x+"\n"+String(e))}};
+ const stopGdb=async()=>{try{await invoke("debug_gdb_stop");setGdbRunning(false);setOutput(x=>x+"\nGDB stopped.")}catch(e){setOutput(x=>x+"\n"+String(e))}};
  return <section className="debug-panel"><header className="debug-header"><Bug size={17}/><div><b>OpenOCD / GDB</b><span>JTAG server process and debugger toolchain check</span></div></header>
  <div className="debug-warning"><AlertTriangle size={13}/> A serial USB adapter is not automatically a JTAG probe. Config files must match your adapter, ESP32 variant and wiring.</div>
  <label className="hw-label">OPENOCD INTERFACE CONFIG</label><input className="debug-input" value={iface} onChange={e=>setIface(e.target.value)}/>
