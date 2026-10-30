@@ -22,9 +22,9 @@ import { ComponentPanel } from "@/frontend/components/ComponentPanel";
 import { BoardPanel } from "@/frontend/components/BoardPanel";
 import { DebugPanel } from "@/frontend/components/DebugPanel";
 import {
-  Activity, AppWindow, Blocks, Bug, ChevronDown, ChevronRight, CircleHelp,
+  Activity, AppWindow, Blocks, Bug, CircleHelp,
   Code2, Cpu, FileCode2, Folder, FolderOpen, GitBranch, Hammer, Layers3,
-  ListTree, Monitor, Play, Plus, Search, Settings2, TerminalSquare,
+  ListTree, Monitor, Play, Settings2, TerminalSquare,
   Usb, X, Save, FilePlus, FolderPlus, ArrowLeft, Wrench,
 } from "lucide-react";
 
@@ -210,7 +210,7 @@ export default function Home() {
     <main className="ide">
       <header className="titlebar" data-tauri-drag-region>
         <div className="brand"><div className="brand-mark">A</div><span>APEX</span><span className="brand-sub">EMBEDDED STUDIO</span></div>
-        <div className="project-title"><Folder size={14}/> {workspace?.name || "No workspace"} <ChevronDown size={13}/></div>
+        <div className="project-title"><Folder size={14}/> {workspace?.name || "No workspace"}</div>
         <div className="title-actions"><button className="subtle-button" onClick={() => void createProject()}>New project</button><span className="connection"><span/> {ports.length > 0 ? `${ports.length} serial port${ports.length === 1 ? "" : "s"} available` : "No serial ports detected"}</span><button aria-label="Minimize" onClick={() => isTauri() && void getCurrentWindow().minimize()}>—</button><button aria-label="Maximize" onClick={() => isTauri() && void getCurrentWindow().toggleMaximize()}>□</button><button aria-label="Close" onClick={() => isTauri() && void getCurrentWindow().close()}>×</button></div>
       </header>
       <div className="workspace">
@@ -225,7 +225,7 @@ export default function Home() {
           <button title="Help" onClick={() => setAppNotice("APEX quick help: open a workspace, create or open a source file, edit it in the editor, then use Build and Flash. For USB detection, check Device Manager and install the board's USB-to-UART driver if needed.")}><CircleHelp/></button>
         </nav>
         <aside className="sidebar">
-          <div className="side-heading"><span>{activeTab === "explorer" ? "EXPLORER" : activeTab === "boards" ? "BOARD MANAGER" : activeTab === "tools" ? "TOOLCHAINS" : activeTab === "debug" ? "DEBUG" : "COMPONENTS"}</span>{activeTab === "explorer" ? <div className="explorer-actions"><button onClick={() => void openWorkspace()} title="Open workspace"><FolderOpen size={14}/></button><button onClick={() => { setCreateKind("file"); setShowCreate(true); }} disabled={!workspace} title="New file"><FilePlus size={14}/></button><button onClick={() => { setCreateKind("directory"); setShowCreate(true); }} disabled={!workspace} title="New folder"><FolderPlus size={14}/></button></div> : <Search size={14}/>}</div>
+          <div className="side-heading"><span>{activeTab === "explorer" ? "EXPLORER" : activeTab === "boards" ? "BOARD MANAGER" : activeTab === "tools" ? "TOOLCHAINS" : activeTab === "debug" ? "DEBUG" : "COMPONENTS"}</span>{activeTab === "explorer" ? <div className="explorer-actions"><button onClick={() => void openWorkspace()} title="Open workspace"><FolderOpen size={14}/></button><button onClick={() => { setCreateKind("file"); setShowCreate(true); }} disabled={!workspace} title="New file"><FilePlus size={14}/></button><button onClick={() => { setCreateKind("directory"); setShowCreate(true); }} disabled={!workspace} title="New folder"><FolderPlus size={14}/></button></div> : null}</div>
           {activeTab === "explorer" && <>
             <div className="tree-root"><FolderOpen size={15}/> {workspace?.name || "NO WORKSPACE"}</div>
             {workspace && currentPath && <button className="tree-back" onClick={() => { const parent = currentPath.replace(/[\\/][^\\/]+$/, ""); setCurrentPath(parent); void refreshWorkspace(parent); }}><ArrowLeft size={13}/> Back</button>}
@@ -250,7 +250,7 @@ export default function Home() {
           <div className="breadcrumbs">{workspace?.name || "Welcome"} <span>/</span> {activeFile || "Untitled.cpp · unsaved buffer"}</div>
           <div className="editor"><Editor height="100%" width="100%" language={activeFile.endsWith(".py") ? "python" : activeFile.endsWith(".json") ? "json" : activeFile.endsWith(".md") ? "markdown" : "cpp"} value={editorValue} onChange={(value) => { setEditorValue(value ?? ""); setDirty(true); }} theme="vs-dark" options={{ minimap: { enabled: false }, fontSize: 13, fontFamily: "Cascadia Code, Consolas, monospace", lineNumbers: "on", scrollBeyondLastLine: false, automaticLayout: true, tabSize: 4, padding: { top: 16 }, renderLineHighlight: "all", readOnly: false }} /></div>
           <div className="bottom-panel">
-            <div className="panel-tabs">{["PROBLEMS", "OUTPUT", "DEBUG CONSOLE", "SERIAL MONITOR", "TERMINAL"].map((name) => <button key={name} className={bottomTab.toUpperCase() === name ? "current" : ""} onClick={() => setBottomTab(name[0] + name.slice(1).toLowerCase())}>{name}</button>)}<Plus size={14}/><div className="panel-spacer"/><ChevronDown size={14}/><X size={14}/></div>
+            <div className="panel-tabs">{["PROBLEMS", "OUTPUT", "DEBUG CONSOLE", "SERIAL MONITOR", "TERMINAL"].map((name) => <button key={name} className={bottomTab.toUpperCase() === name ? "current" : ""} onClick={() => setBottomTab(name[0] + name.slice(1).toLowerCase())}>{name}</button>)}<div className="panel-spacer"/></div>
             {bottomTab === "Terminal" ? <TerminalPanel /> : bottomTab === "Serial monitor" && selectedPort ? <SerialMonitorPanel key={selectedPort} portName={selectedPort} /> : bottomTab === "Output" ? <pre className="firmware-output">{firmwareOutput || "Build and flash output will appear here."}</pre> : <div className="panel-placeholder">{bottomTab === "Problems" ? "No diagnostics provider is connected yet. Compiler diagnostics will appear here after build integration." : bottomTab === "Debug console" ? "The GDB console is available in the JTAG Debug workspace." : bottomTab === "Serial monitor" ? "Select a detected serial port in Board Manager, then choose Monitor." : bottomTab}</div>}
           </div>
         </section>
