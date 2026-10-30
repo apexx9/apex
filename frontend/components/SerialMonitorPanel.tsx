@@ -46,11 +46,13 @@ export function SerialMonitorPanel({ portName }: { portName: string }) {
       return;
     }
     setError("");
+    setStatus("Connecting");
     try {
       const id = crypto.randomUUID();
       unlistenRef.current = await listen<SerialOutput>("apex://serial-output", (event) => {
         if (event.payload.sessionId === sessionRef.current) {
           terminalRef.current?.write(event.payload.text);
+          if (event.payload.stream === "system") setStatus("Connection lost");
         }
       });
       sessionRef.current = id;
