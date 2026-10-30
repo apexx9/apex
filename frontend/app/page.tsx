@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Editor from "@monaco-editor/react";
+import { TerminalPanel } from "@/components/TerminalPanel";
 import {
   Activity, AppWindow, Blocks, ChevronDown, ChevronRight, CircleHelp,
   Code2, Cpu, FileCode2, Folder, FolderOpen, GitBranch, Hammer, Layers3,
@@ -32,7 +33,6 @@ type Tab = "explorer" | "boards" | "components";
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("explorer");
   const [bottomTab, setBottomTab] = useState("Terminal");
-  const [terminalText] = useState("APEX terminal service is not connected yet.\nThe native PTY integration is scheduled for the next implementation phase.");
   const [showWelcome, setShowWelcome] = useState(true);
 
   return (
@@ -72,7 +72,7 @@ export default function Home() {
           <div className="editor"><Editor height="100%" defaultLanguage="cpp" defaultValue={source} theme="vs-dark" options={{ minimap: { enabled: false }, fontSize: 13, fontFamily: "Cascadia Code, Consolas, monospace", lineNumbers: "on", scrollBeyondLastLine: false, automaticLayout: true, tabSize: 4, padding: { top: 16 }, renderLineHighlight: "all" }}/></div>
           <div className="bottom-panel">
             <div className="panel-tabs">{["PROBLEMS", "OUTPUT", "DEBUG CONSOLE", "TERMINAL"].map((name) => <button key={name} className={bottomTab.toUpperCase() === name ? "current" : ""} onClick={() => setBottomTab(name[0] + name.slice(1).toLowerCase())}>{name}</button>)}<Plus size={14}/><div className="panel-spacer"/><ChevronDown size={14}/><X size={14}/></div>
-            <div className="terminal-content"><div className="terminal-label"><TerminalSquare size={14}/> POWERSHELL</div><pre>{terminalText}<br/><span className="prompt">PS C:\\apex\\esp32-blink&gt;</span> <span className="cursor"/></pre></div>
+            <TerminalPanel />
           </div>
         </section>
       </div>
