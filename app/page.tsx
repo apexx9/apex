@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { invoke, isTauri } from "@tauri-apps/api/core";
-import Editor from "@monaco-editor/react";
+import dynamic from "next/dynamic";
+
+const Editor = dynamic(() => import("@monaco-editor/react"), {
+  ssr: false,
+  loading: () => <div className="editor-loading">Loading code editor…</div>,
+});
 import { TerminalPanel } from "@/frontend/components/TerminalPanel";
 import { SerialMonitorPanel } from "@/frontend/components/SerialMonitorPanel";
 import {
