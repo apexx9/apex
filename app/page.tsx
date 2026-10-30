@@ -92,7 +92,8 @@ export default function Home() {
     } catch (error) { setWorkspaceError(error instanceof Error ? error.message : String(error)); }
   };
   const buildFirmware = async () => {
-    if (!workspace || firmwareBusy) return;
+    if (firmwareBusy) return;
+    if (!workspace) { setFirmwareOutput("Open a workspace or create a project before building firmware."); setBottomTab("Output"); return; }
     setFirmwareBusy(true); setBottomTab("Output"); setFirmwareOutput("Building…");
     try {
       const result = await invoke<FirmwareResult>("firmware_build", { framework });
@@ -242,7 +243,7 @@ export default function Home() {
           {activeTab === "components" && <ComponentPanel framework={framework} />}
         </aside>
         <section className="editor-area">
-          <div className="tabs"><div className="file-tab"><FileCode2 size={14}/> {activeFile ? activeFile.split(/[\\/]/).pop() : "Untitled.cpp"} {dirty && <span className="dirty-dot"/>}</div><div className="editor-actions"><button title="Save file (Ctrl+S)" onClick={() => void saveFile()} disabled={!dirty || !workspace}><Save size={15}/></button><select aria-label="Firmware framework" value={framework} onChange={(event) => setFramework(event.target.value as "arduino" | "esp-idf")}><option value="arduino">Arduino</option><option value="esp-idf">ESP-IDF</option></select><button title="Build firmware" onClick={() => void buildFirmware()} disabled={!workspace || firmwareBusy}><Hammer size={15}/></button><button title="Flash firmware to selected serial port" onClick={() => void flashFirmware()} disabled={!workspace || firmwareBusy}><Play size={15}/></button></div></div>
+          <div className="tabs"><div className="file-tab"><FileCode2 size={14}/> {activeFile ? activeFile.split(/[\\/]/).pop() : "Untitled.cpp"} {dirty && <span className="dirty-dot"/>}</div><div className="editor-actions"><button title="Save file (Ctrl+S)" onClick={() => void saveFile()} disabled={!dirty || !workspace}><Save size={15}/></button><select aria-label="Firmware framework" value={framework} onChange={(event) => setFramework(event.target.value as "arduino" | "esp-idf")}><option value="arduino">Arduino</option><option value="esp-idf">ESP-IDF</option></select><button title="Build firmware" onClick={() => void buildFirmware()} disabled={firmwareBusy} title={!workspace ? "Open a workspace before building" : "Build firmware"}><Hammer size={15}/></button><button title="Flash firmware to selected serial port" onClick={() => void flashFirmware()} disabled={firmwareBusy} title={!workspace ? "Open a workspace and select a serial port before flashing" : !selectedPort ? "Select a serial port in Board Manager" : "Flash firmware"}><Play size={15}/></button></div></div>
           <div className="breadcrumbs">{workspace?.name || "Welcome"} <span>/</span> {activeFile || "Untitled.cpp · unsaved buffer"}</div>
           <div className="editor"><Editor height="100%" width="100%" language={activeFile.endsWith(".py") ? "python" : activeFile.endsWith(".json") ? "json" : activeFile.endsWith(".md") ? "markdown" : "cpp"} value={editorValue} onChange={(value) => { setEditorValue(value ?? ""); setDirty(true); }} theme="vs-dark" options={{ minimap: { enabled: false }, fontSize: 13, fontFamily: "Cascadia Code, Consolas, monospace", lineNumbers: "on", scrollBeyondLastLine: false, automaticLayout: true, tabSize: 4, padding: { top: 16 }, renderLineHighlight: "all", readOnly: false }} /></div>
           <div className="bottom-panel">
