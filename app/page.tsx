@@ -88,6 +88,16 @@ export default function Home() {
     } catch (error) { setWorkspaceError(error instanceof Error ? error.message : String(error)); }
   };
   useEffect(() => {
+    const handleSave = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+        event.preventDefault();
+        void saveFile();
+      }
+    };
+    window.addEventListener("keydown", handleSave);
+    return () => window.removeEventListener("keydown", handleSave);
+  }, [activeFile, dirty, editorValue]);
+  useEffect(() => {
     if (!isTauri()) return;
     void invoke<WorkspaceInfo | null>("workspace_current").then(async (current) => {
       if (current) { setWorkspace(current); await refreshWorkspace(""); }
@@ -121,7 +131,7 @@ export default function Home() {
           <div className="side-heading"><span>{activeTab === "explorer" ? "EXPLORER" : activeTab === "boards" ? "BOARD MANAGER" : "COMPONENTS"}</span>{activeTab === "explorer" ? <div className="explorer-actions"><button onClick={() => void openWorkspace()} title="Open workspace"><FolderOpen size={14}/></button><button onClick={() => { setCreateKind("file"); setShowCreate(true); }} disabled={!workspace} title="New file"><FilePlus size={14}/></button><button onClick={() => { setCreateKind("directory"); setShowCreate(true); }} disabled={!workspace} title="New folder"><FolderPlus size={14}/></button></div> : <Search size={14}/>}</div>
           {activeTab === "explorer" && <>
             <div className="tree-root"><FolderOpen size={15}/> {workspace?.name || "NO WORKSPACE"}</div>
-            {workspace && currentPath && <button className="tree-back" onClick={() => { const parent = currentPath.includes("/") ? currentPath.slice(0, currentPath.lastIndexOf("/")) : ""; setCurrentPath(parent); void refreshWorkspace(parent); }}><ArrowLeft size={13}/> Back</button>}
+            {workspace && currentPath && <button className="tree-back" onClick={() => { const parent = currentPath.replace(/[\\/][^\\/]+$/, ""); setCurrentPath(parent); void refreshWorkspace(parent); }}><ArrowLeft size={13}/> Back</button>}
             {showCreate && <div className="create-entry"><span>{createKind === "file" ? "New file" : "New folder"}</span><input autoFocus value={newEntryName} onChange={(event) => setNewEntryName(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") void createEntry(); if (event.key === "Escape") setShowCreate(false); }} placeholder="Name"/><div><button onClick={() => void createEntry()}>Create</button><button onClick={() => setShowCreate(false)}>Cancel</button></div></div>}
             {workspaceError && <div className="workspace-error">{workspaceError}</div>}
             {!workspace && <div className="empty-state"><FolderOpen size={22}/><strong>No workspace open</strong><span>Open a folder to browse and edit your firmware project.</span><button className="subtle-button" onClick={() => void openWorkspace()}>Open workspace</button></div>}
