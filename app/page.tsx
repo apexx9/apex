@@ -253,7 +253,7 @@ export default function Home() {
         </section>
       </div>
       <footer className="statusbar"><div><GitBranch size={13}/> main <span>●</span> Workspace</div><div><Usb size={13}/> Serial ports <span>UTF-8</span><span>CRLF</span><span>C++</span><Activity size={13}/> Ready</div></footer>
-      {appNotice && <div className="welcome-toast"><div><strong>APEX</strong><p>{appNotice}</p></div><button onClick={() => setAppNotice("")} aria-label="Dismiss"><X size={14}/></button></div>}
+      {appNotice && <div className="app-notice"><div><strong>APEX</strong><p>{appNotice}</p></div><button onClick={() => setAppNotice("")} aria-label="Dismiss"><X size={14}/></button></div>}
       {showWelcome && <div className="welcome-toast"><div className="welcome-icon"><AppWindow size={18}/></div><div><strong>Welcome to APEX</strong><p>Your embedded development workspace is taking shape.</p></div><button onClick={() => setShowWelcome(false)} aria-label="Dismiss"><X size={14}/></button></div>}
     </main>
   );
