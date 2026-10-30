@@ -10,7 +10,8 @@ export function BoardPanel({framework}:{framework:"arduino"|"esp-idf"}){
  const [profiles,setProfiles]=useState<Profile[]>([]),[selected,setSelected]=useState("esp32-classic-generic-30"),[pins,setPins]=useState<number[]>([2]),[peripheral,setPeripheral]=useState("gpio"),[result,setResult]=useState<Result|null>(null),[error,setError]=useState(""),[busy,setBusy]=useState(false);
  useEffect(()=>{if(isTauri())void invoke<Profile[]>("board_profiles").then(setProfiles).catch(e=>setError(String(e)));},[]);
  const profile=profiles.find(x=>x.id===selected)||profiles[0];
- const toggle=(n:number)=>setPins(old=>old.includes(n)?old.filter(x=>x!==n):[...old,n].sort((a,b)=>a-b));
+ // Preserve click order: peripheral generators interpret selected pins as ordered signals.
+ const toggle=(n:number)=>setPins(old=>old.includes(n)?old.filter(x=>x!==n):[...old,n]);
  const generate=async()=>{setBusy(true);setError("");try{setResult(await invoke<Result>("peripheral_generate",{peripheral,pins,framework}));}catch(e){setError(String(e));setResult(null)}finally{setBusy(false)}};
  return <section className="board-workbench">
   <header className="board-workbench-head"><Cpu size={16}/><strong>Board profile & GPIO explorer</strong></header>
@@ -21,7 +22,7 @@ export function BoardPanel({framework}:{framework:"arduino"|"esp-idf"}){
   <div className="pin-legend">Selected: {pins.length?pins.map(x=>"GPIO"+x).join(", "):"none"} · Select pins for configuration</div></>}
   <div className="peripheral-config"><div className="peripheral-heading"><Wrench size={13}/> Peripheral configuration & code generation</div>
   <label className="hw-label">PERIPHERAL</label><select className="hw-select" value={peripheral} onChange={e=>setPeripheral(e.target.value)}>{choices.map(([v,l])=><option value={v} key={v}>{l}</option>)}</select>
-  <p className="hw-hint">For I²C, SPI, UART and TWAI, select at least two pins in signal order. Generated code is a starting point; verify wiring, voltage and target-specific details before flashing.</p>
+  <p className="hw-hint">{peripheral==="i2c"?"Select pins in order: SDA, then SCL.":peripheral==="uart"?"Select pins in order: RX, then TX.":peripheral==="spi"?"Select pins in order: SCLK, MISO, MOSI, then CS.":peripheral==="can"?"Select pins in order: TX, then RX.":"Select exactly one GPIO."} Generated code is a starting point; verify wiring, voltage and target-specific details before flashing.</p>
   <button className="hw-primary" disabled={busy||pins.length===0} onClick={()=>void generate()}>{busy?"Generating…":"Generate configuration"}</button>
   {error&&<p className="hw-error">{error}</p>}
   {result&&<><b className="hw-result-title">{result.summary}</b>{result.conflicts.map(x=><p className="hw-conflict" key={x}><AlertTriangle size={12}/>{x}</p>)}{result.warnings.map(x=><p className="hw-warning" key={x}><AlertTriangle size={12}/>{x}</p>)}<pre className="hw-code">{result.code}</pre><button className="hw-secondary" onClick={()=>void navigator.clipboard.writeText(result.code)}><Copy size={12}/> Copy generated code</button></>}
