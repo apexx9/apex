@@ -9,9 +9,13 @@ fn app_version() -> &'static str {
 
 #[tauri::command]
 fn terminal_default_cwd() -> Result<String, String> {
-    std::env::current_dir()
-        .map(|path| path.to_string_lossy().into_owned())
-        .map_err(|error| format!("Could not determine the current directory: {error}"))
+    let home = std::env::var_os("USERPROFILE")
+        .or_else(|| std::env::var_os("HOME"))
+        .map(std::path::PathBuf::from)
+        .filter(|path| path.is_dir());
+    let path = home.or_else(|| std::env::current_dir().ok())
+        .ok_or_else(|| "Could not determine a starting directory for the terminal".to_string())?;
+    Ok(path.to_string_lossy().into_owned())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -27,11 +31,6 @@ pub fn run() {
             terminal::terminal_stop,
             terminal::terminal_stop_all
         ])
-        .build(tauri::generate_context!())
-        .expect("error while building APEX")
-        .run(|app, event| {
-            if let tauri::RunEvent::Exit = event {
-                app.state::<TerminalManager>().shutdown();
-            }
-        });
+        .run(tauri::generate_context!())
+        .expect("error while running APEX");
 }
