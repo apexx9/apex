@@ -172,3 +172,8 @@ button { color: inherit; font: inherit; cursor: pointer; }
 .toolchain-note svg { flex: 0 0 13px; margin-top: 1px; color: #c4aa70; }
 .spin { animation: apex-spin 1s linear infinite; }
 @keyframes apex-spin { to { transform: rotate(360deg); } }
+
+.title-actions button.subtle-button { width: auto; padding: 5px 8px; border: 1px solid #3a4234; background: #22291e; color: #d6f36a; font-size: 10px; }
+.editor-actions select { height: 25px; margin: 0 5px; padding: 0 6px; border: 1px solid #343a40; background: #1a1e21; color: #bfc6cd; font-size: 10px; outline: none; }
+.editor-actions button:hover:not(:disabled) { color: #d6f36a; background: #242a20; }
+.firmware-output { min-height: 0; flex: 1; margin: 0; padding: 10px 14px; overflow: auto; color: #bfc7ce; background: #111315; font: 10px/1.65 "Cascadia Code", Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
