@@ -14,7 +14,7 @@ pub struct BoardProfile {
     verified: bool, pins: Vec<Pin>, warnings: Vec<&'static str>,
 }
 fn classic_esp32_pins() -> Vec<Pin> {
-    (0u8..=39).filter(|g| !matches!(g, 6..=11 | 20 | 24 | 28..=31)).map(|g| {
+    (0u8..=39).filter(|g| !matches!(*g, 6..=11 | 20 | 24 | 28..=31)).map(|g| {
         let input_only = (34..=39).contains(&g);
         let adc = if (32..=39).contains(&g) { Some("ADC1") }
             else if (0..=4).contains(&g) || (12..=15).contains(&g) || (25..=27).contains(&g) { Some("ADC2") } else { None };
