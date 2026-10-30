@@ -75,7 +75,7 @@ export default function Home() {
   const [createKind, setCreateKind] = useState<"file" | "directory">("file");
   const [newEntryName, setNewEntryName] = useState("");
   const createProject = async () => {
-    if (!isTauri()) return;
+    if (!isTauri()) { setAppNotice("Project creation is available in the installed APEX desktop application."); return; }
     if (dirty && !window.confirm("Discard unsaved changes and create a new project?")) return;
     const name = window.prompt("Project name (letters, numbers, hyphens and underscores):", "esp32-project");
     if (!name) return;
@@ -89,7 +89,7 @@ export default function Home() {
       setWorkspace(current); setCurrentPath(""); setActiveFile(""); setDirty(false);
       await refreshWorkspace("");
       setFirmwareOutput("Created project at " + path); setBottomTab("Output");
-    } catch (error) { setWorkspaceError(error instanceof Error ? error.message : String(error)); }
+    } catch (error) { const message = error instanceof Error ? error.message : String(error); setWorkspaceError(message); setAppNotice(message); }
   };
   const buildFirmware = async () => {
     if (firmwareBusy) return;
@@ -125,7 +125,7 @@ export default function Home() {
       if (!opened) return;
       setWorkspace(opened); setCurrentPath(""); setActiveFile(""); setDirty(false);
       await refreshWorkspace("");
-    } catch (error) { setWorkspaceError(error instanceof Error ? error.message : String(error)); }
+    } catch (error) { const message = error instanceof Error ? error.message : String(error); setWorkspaceError(message); setAppNotice(message); }
   };
   const openEntry = async (entry: WorkspaceEntry) => {
     if (!entry.isDirectory && dirty && !window.confirm("Discard unsaved changes in the current file?")) return;
@@ -133,7 +133,7 @@ export default function Home() {
     try {
       const value = await invoke<string>("workspace_read_file", { relativePath: entry.relativePath });
       setActiveFile(entry.relativePath); setEditorValue(value); setDirty(false);
-    } catch (error) { setWorkspaceError(error instanceof Error ? error.message : String(error)); }
+    } catch (error) { const message = error instanceof Error ? error.message : String(error); setWorkspaceError(message); setAppNotice(message); }
   };
   const saveFile = async () => {
     if (!dirty) return;
@@ -150,7 +150,7 @@ export default function Home() {
       }
       await invoke("workspace_write_file", { relativePath: target, content: editorValue });
       setActiveFile(target); setDirty(false); await refreshWorkspace(currentPath); setWorkspaceError("");
-    } catch (error) { setWorkspaceError(error instanceof Error ? error.message : String(error)); }
+    } catch (error) { const message = error instanceof Error ? error.message : String(error); setWorkspaceError(message); setAppNotice(message); }
   };
   const createEntry = async () => {
     if (!newEntryName.trim()) return;
@@ -163,7 +163,7 @@ export default function Home() {
         setEditorValue("");
         setDirty(false);
       }
-    } catch (error) { setWorkspaceError(error instanceof Error ? error.message : String(error)); }
+    } catch (error) { const message = error instanceof Error ? error.message : String(error); setWorkspaceError(message); setAppNotice(message); }
   };
   useEffect(() => {
     const handleSave = (event: KeyboardEvent) => {
