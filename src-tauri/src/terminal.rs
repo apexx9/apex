@@ -28,14 +28,20 @@ pub struct TerminalManager {
     sessions: Arc<Mutex<HashMap<String, Session>>>,
 }
 
-impl Drop for TerminalManager {
-    fn drop(&mut self) {
-        if let Ok(sessions) = self.sessions.get_mut() {
+impl TerminalManager {
+    pub fn shutdown(&self) {
+        if let Ok(mut sessions) = self.sessions.lock() {
             for (_, mut session) in sessions.drain() {
                 let _ = session.child.kill();
                 let _ = session.child.wait();
             }
         }
+    }
+}
+
+impl Drop for TerminalManager {
+    fn drop(&mut self) {
+        self.shutdown();
     }
 }
 
