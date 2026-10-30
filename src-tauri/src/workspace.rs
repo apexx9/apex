@@ -168,7 +168,13 @@ pub fn workspace_write_file(
     let path = match resolve_existing(&root, &relative_path) {
         Ok(path) if path.is_file() => path,
         Ok(_) => return Err("Selected path is not a file".into()),
-        Err(_) => resolve_new(&root, &relative_path)?,
+        Err(_) => {
+            let candidate = resolve_new(&root, &relative_path)?;
+            if candidate.exists() {
+                return Err("Refusing to write through an unresolved or symbolic link".into());
+            }
+            candidate
+        }
     };
     fs::write(path, content).map_err(|error| format!("Could not save file: {error}"))
 }
