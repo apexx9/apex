@@ -145,3 +145,30 @@ button { color: inherit; font: inherit; cursor: pointer; }
 .editor-actions button:disabled { opacity: .35; cursor: not-allowed; }
 
 .editor-loading { display: grid; width: 100%; height: 100%; place-items: center; color: #87919a; background: #111315; font: 11px "Cascadia Code", Consolas, monospace; }
+
+.toolchain-panel { display: flex; flex-direction: column; min-height: 0; gap: 10px; padding: 14px 12px; overflow-y: auto; }
+.toolchain-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.toolchain-header > div { display: flex; align-items: center; gap: 9px; color: #d6f36a; }
+.toolchain-header > div > div { display: flex; flex-direction: column; gap: 3px; }
+.toolchain-header strong { color: #d9dee3; font-size: 11px; }
+.toolchain-header span { color: #818b94; font-size: 9px; }
+.toolchain-header button { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border: 1px solid #394238; background: #252b21; color: #d6f36a; font-size: 10px; }
+.toolchain-header button:disabled { opacity: .5; }
+.toolchain-summary { padding: 8px 9px; border: 1px solid #2d3338; background: #191d20; color: #b8c0c7; font-size: 10px; }
+.toolchain-list { display: flex; flex-direction: column; border: 1px solid #2c3237; }
+.toolchain-item { display: flex; align-items: center; gap: 9px; padding: 9px 8px; border-bottom: 1px solid #292f34; }
+.toolchain-item:last-child { border-bottom: 0; }
+.toolchain-state { display: grid; place-items: center; width: 23px; height: 23px; flex: 0 0 23px; }
+.toolchain-state.found { color: #d6f36a; background: #293020; }
+.toolchain-state.missing { color: #858d95; background: #24282c; }
+.toolchain-info { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.toolchain-info strong { color: #d0d6dc; font-size: 10px; }
+.toolchain-info span { overflow: hidden; color: #8d969e; font: 9px "Cascadia Code", Consolas, monospace; text-overflow: ellipsis; white-space: nowrap; }
+.toolchain-info small { color: #707a83; font-size: 9px; }
+.toolchain-badge { padding: 3px 5px; font-size: 8px; letter-spacing: .6px; }
+.toolchain-badge.found { border: 1px solid #414a35; color: #c6df91; }
+.toolchain-badge.missing { border: 1px solid #3a4046; color: #8c959d; }
+.toolchain-note { display: flex; align-items: flex-start; gap: 7px; color: #8b949c; font-size: 9px; line-height: 1.5; }
+.toolchain-note svg { flex: 0 0 13px; margin-top: 1px; color: #c4aa70; }
+.spin { animation: apex-spin 1s linear infinite; }
+@keyframes apex-spin { to { transform: rotate(360deg); } }
