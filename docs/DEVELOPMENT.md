@@ -47,6 +47,14 @@ Install ESP-IDF using Espressif's official Windows installer or setup guide. Ope
 
 Build and flash commands execute native tools directly with argument arrays. Their actual exit code and output are shown in the Output panel. A missing toolchain is reported as an error; APEX does not fake a successful operation.
 
+## Board metadata and peripheral planning
+
+The first board profile describes classic ESP32 silicon capabilities only. GPIO numbers are not a physical header map. Confirm the exact module and board schematic before connecting signals. The peripheral planner validates selected pins and generates starter source/configuration; it does not sample live pins. Live diagnostics require compatible firmware on the target and a real serial/JTAG connection.
+
+## Debugging
+
+The JTAG panel starts/stops OpenOCD using user-selected interface and target config files. Install the official ESP-IDF toolchain and select a matching GDB executable. OpenOCD server output is streamed into APEX; full GDB interactive controls are not yet available.
+
 ## Hardware acceptance checklist
 
 The following requires a real board and is intentionally not claimed as CI-verified:
