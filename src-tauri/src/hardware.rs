@@ -127,3 +127,31 @@ pub fn peripheral_generate(peripheral: String, pins: Vec<u8>, framework: String)
     };
     Ok(PeripheralResult { code, conflicts, warnings, summary:format!("{} configuration for {} using GPIO {:?}",peripheral.to_uppercase(),framework,pins) })
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::peripheral_generate;
+
+    #[test]
+    fn rejects_incomplete_i2c_pin_assignment() {
+        assert!(peripheral_generate("i2c".into(), vec![21], "arduino".into()).is_err());
+    }
+
+    #[test]
+    fn rejects_incomplete_spi_pin_assignment() {
+        assert!(peripheral_generate("spi".into(), vec![18, 19], "arduino".into()).is_err());
+    }
+
+    #[test]
+    fn rejects_unbonded_classic_esp32_gpio() {
+        assert!(peripheral_generate("gpio".into(), vec![20], "arduino".into()).is_err());
+    }
+
+    #[test]
+    fn generates_spi_with_all_four_selected_signals() {
+        let result = peripheral_generate("spi".into(), vec![18, 19, 23, 5], "arduino".into()).unwrap();
+        assert!(result.code.contains("SPI.begin(APEX_SCLK, APEX_MISO, APEX_MOSI, APEX_CS)"));
+        assert!(result.conflicts.is_empty());
+    }
+}
