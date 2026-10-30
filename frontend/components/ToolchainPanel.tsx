@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { invoke, isTauri } from "@tauri-apps/api/core";
-import { Check, CircleAlert, CircleDashed, RefreshCw, Wrench } from "lucide-react";
+import { Check, CircleAlert, CircleDashed, RefreshCw, Wrench, Download } from "lucide-react";
 
 type ToolchainItem = {
   id: string;
@@ -17,6 +17,8 @@ export function ToolchainPanel() {
   const [tools, setTools] = useState<ToolchainItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [installing,setInstalling]=useState("");
+  const [installOutput,setInstallOutput]=useState("");
 
   const scan = async () => {
     if (!isTauri()) {
@@ -37,6 +39,7 @@ export function ToolchainPanel() {
   useEffect(() => { void scan(); }, []);
 
   const installed = tools.filter((tool) => tool.installed).length;
+  const install = async (id:string) => { setInstalling(id); setInstallOutput(""); try { const result=await invoke<{success:boolean;output:string;command:string}>("toolchain_install",{tool:id}); setInstallOutput(result.command+"\n"+result.output); await scan(); } catch(e) { setInstallOutput(String(e)); } finally { setInstalling(""); } };
 
   return (
     <section className="toolchain-panel">
@@ -56,10 +59,10 @@ export function ToolchainPanel() {
             <span>{tool.version || (tool.executable ?? "Not found on PATH")}</span>
             <small>{tool.requiredFor}</small>
           </div>
-          <span className={tool.installed ? "toolchain-badge found" : "toolchain-badge missing"}>{tool.installed ? "FOUND" : "MISSING"}</span>
+          <span className={tool.installed ? "toolchain-badge found" : "toolchain-badge missing"}>{tool.installed ? "FOUND" : "MISSING"}</span>{!tool.installed && ["git","python","cmake","ninja","arduino-cli"].includes(tool.id) && <button className="tool-install" disabled={!!installing} onClick={()=>void install(tool.id)}><Download size={11}/>{installing===tool.id?"Installing":"Install"}</button>}
         </article>)}
       </div>
-      {tools.length > 0 && <p className="toolchain-note"><CircleAlert size={13}/> Detection checks PATH only. ESP-IDF installations that have not been added to PATH may need manual environment setup.</p>}
+      {installOutput && <pre className="toolchain-install-output">{installOutput}</pre>}{tools.length > 0 && <p className="toolchain-note"><CircleAlert size={13}/> Detection checks PATH. Use Espressif official ESP-IDF installer for ESP-IDF, compiler toolchains, OpenOCD and GDB; APEX does not download unverified toolchain installers.</p>}
     </section>
   );
 }
