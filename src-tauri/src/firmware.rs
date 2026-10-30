@@ -30,7 +30,7 @@ pub fn firmware_create_project(name: String, framework: String) -> Result<String
     if root.exists() { return Err(format!("A folder named {name} already exists at the selected location")); }
     fs::create_dir_all(&root).map_err(|e| format!("Could not create project directory: {e}"))?;
     let result=(|| -> std::io::Result<()> {
-        fs::write(root.join(".gitignore"), "build/\n\.pio/\n\.vscode/\n*.bin\n*.elf\n")?;
+        fs::write(root.join(".gitignore"), "build/\n.pio/\n.vscode/\n*.bin\n*.elf\n")?;
         fs::write(root.join("README.md"), format!("# {name}\n\nCreated with APEX.\n\nFramework: {framework}\nTarget: generic Espressif ESP32 (verify the exact module and board before flashing).\n"))?;
         match framework.as_str() {
             "arduino" => {
