@@ -5,6 +5,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import Editor from "@monaco-editor/react";
 import { TerminalPanel } from "@/frontend/components/TerminalPanel";
+import { SerialMonitorPanel } from "@/frontend/components/SerialMonitorPanel";
 import {
   Activity, AppWindow, Blocks, ChevronDown, ChevronRight, CircleHelp,
   Code2, Cpu, FileCode2, Folder, FolderOpen, GitBranch, Hammer, Layers3,
@@ -40,6 +41,7 @@ export default function Home() {
   const [ports, setPorts] = useState<SerialPort[]>([]);
   const [portsError, setPortsError] = useState("");
   const [portsLoading, setPortsLoading] = useState(false);
+  const [selectedPort, setSelectedPort] = useState("");
   const refreshPorts = async () => {
     if (!isTauri()) { setPortsError("Serial discovery requires the APEX desktop runtime."); return; }
     setPortsLoading(true); setPortsError("");
@@ -80,7 +82,7 @@ export default function Home() {
             <div className="board-intro"><Cpu size={22}/><strong>Connected serial ports</strong><span>Port presence does not confirm board identity. Select a port only after verifying your hardware.</span><button className="subtle-button" onClick={() => void refreshPorts()} disabled={portsLoading}>{portsLoading ? "Scanning…" : "Refresh ports"}</button></div>
             {portsError && <div className="port-error">{portsError}</div>}
             {ports.length === 0 && !portsLoading && !portsError && <div className="port-empty">No serial ports found.</div>}
-            {ports.map((port) => <div className="port-card" key={port.name}><div className="port-icon"><Usb size={15}/></div><div className="port-details"><strong>{port.name}</strong><span>{port.product || port.manufacturer || port.portType.toUpperCase()}</span>{port.vendorId != null && port.productId != null && <small>VID {port.vendorId.toString(16).padStart(4,"0").toUpperCase()} · PID {port.productId.toString(16).padStart(4,"0").toUpperCase()}</small>}</div><span className="port-tag">PORT</span></div>)}
+            {ports.map((port) => <div className="port-card" key={port.name}><div className="port-icon"><Usb size={15}/></div><div className="port-details"><strong>{port.name}</strong><span>{port.product || port.manufacturer || port.portType.toUpperCase()}</span>{port.vendorId != null && port.productId != null && <small>VID {port.vendorId.toString(16).padStart(4,"0").toUpperCase()} · PID {port.productId.toString(16).padStart(4,"0").toUpperCase()}</small>}</div><button className="port-monitor-button" onClick={() => { setSelectedPort(port.name); setBottomTab("Serial monitor"); }}>Monitor</button></div>)}
           </div>}
           {activeTab === "components" && <div className="empty-state"><Blocks size={22}/><strong>Component manager</strong><span>Install and manage project dependencies from supported registries.</span></div>}
         </aside>
@@ -89,8 +91,8 @@ export default function Home() {
           <div className="breadcrumbs">main <span>/</span> main.cpp</div>
           <div className="editor"><Editor height="100%" defaultLanguage="cpp" defaultValue={source} theme="vs-dark" options={{ minimap: { enabled: false }, fontSize: 13, fontFamily: "Cascadia Code, Consolas, monospace", lineNumbers: "on", scrollBeyondLastLine: false, automaticLayout: true, tabSize: 4, padding: { top: 16 }, renderLineHighlight: "all" }}/></div>
           <div className="bottom-panel">
-            <div className="panel-tabs">{["PROBLEMS", "OUTPUT", "DEBUG CONSOLE", "TERMINAL"].map((name) => <button key={name} className={bottomTab.toUpperCase() === name ? "current" : ""} onClick={() => setBottomTab(name[0] + name.slice(1).toLowerCase())}>{name}</button>)}<Plus size={14}/><div className="panel-spacer"/><ChevronDown size={14}/><X size={14}/></div>
-            <TerminalPanel />
+            <div className="panel-tabs">{["PROBLEMS", "OUTPUT", "DEBUG CONSOLE", "SERIAL MONITOR", "TERMINAL"].map((name) => <button key={name} className={bottomTab.toUpperCase() === name ? "current" : ""} onClick={() => setBottomTab(name[0] + name.slice(1).toLowerCase())}>{name}</button>)}<Plus size={14}/><div className="panel-spacer"/><ChevronDown size={14}/><X size={14}/></div>
+            {bottomTab === "Terminal" ? <TerminalPanel /> : bottomTab === "Serial monitor" && selectedPort ? <SerialMonitorPanel key={selectedPort} portName={selectedPort} /> : <div className="panel-placeholder">{bottomTab} panel is not implemented yet.</div>}
           </div>
         </section>
       </div>
