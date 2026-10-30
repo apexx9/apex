@@ -154,4 +154,18 @@ mod tests {
         assert!(result.code.contains("SPI.begin(APEX_SCLK, APEX_MISO, APEX_MOSI, APEX_CS)"));
         assert!(result.conflicts.is_empty());
     }
+
+    #[test]
+    fn generates_esp_idf_spi_with_all_four_signals() {
+        let result = peripheral_generate("spi".into(), vec![18, 19, 23, 5], "esp-idf".into()).unwrap();
+        assert!(result.code.contains("APEX_SPI_SCLK GPIO_NUM_18"));
+        assert!(result.code.contains("APEX_SPI_MISO GPIO_NUM_19"));
+        assert!(result.code.contains("APEX_SPI_MOSI GPIO_NUM_23"));
+        assert!(result.code.contains("APEX_SPI_CS GPIO_NUM_5"));
+    }
+
+    #[test]
+    fn rejects_non_adc_gpio() {
+        assert!(peripheral_generate("adc".into(), vec![16], "arduino".into()).is_err());
+    }
 }
