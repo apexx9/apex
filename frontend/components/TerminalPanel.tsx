@@ -23,13 +23,9 @@ export function TerminalPanel() {
   };
 
   const closeSession = (id: string) => {
-    setSessions((current) => {
-      const remaining = current.filter((session) => session.id !== id);
-      if (activeId === id) {
-        setActiveId(remaining[remaining.length - 1]?.id ?? "");
-      }
-      return remaining;
-    });
+    const remaining = sessions.filter((session) => session.id !== id);
+    setSessions(remaining);
+    if (activeId === id) setActiveId(remaining[remaining.length - 1]?.id ?? "");
   };
 
   useEffect(() => {
@@ -108,6 +104,7 @@ function TerminalSessionView({ session, active }: { session: SessionInfo; active
         const cwd = await invoke<string>("terminal_default_cwd");
         if (disposed) return;
         try { fit.fit(); } catch { /* host may not have been laid out yet */ }
+        sessionRef.current = session.id;
         const started = await invoke<StartedEvent>("terminal_start", {
           sessionId: session.id, shell: session.shell, cwd, cols: terminal.cols, rows: terminal.rows,
         });
