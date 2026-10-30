@@ -77,8 +77,9 @@ export default function Home() {
   const createProject = async () => {
     if (!isTauri()) { setAppNotice("Project creation is available in the installed APEX desktop application."); return; }
     if (dirty && !window.confirm("Discard unsaved changes and create a new project?")) return;
-    const name = window.prompt("Project name (letters, numbers, hyphens and underscores):", "esp32-project");
-    if (!name) return;
+    const enteredName = window.prompt("Project name (letters, numbers, hyphens and underscores):", "esp32-project");
+    if (!enteredName) return;
+    const name = enteredName.trim();
     const selected = window.prompt("Framework: enter arduino or esp-idf", framework);
     if (selected !== "arduino" && selected !== "esp-idf") return;
     setFramework(selected);
@@ -86,7 +87,9 @@ export default function Home() {
       const path = await invoke<string>("firmware_create_project", { name, framework: selected });
       await invoke("workspace_open_path", { path });
       const current = await invoke<WorkspaceInfo | null>("workspace_current");
-      setWorkspace(current); setCurrentPath(""); setActiveFile(""); setDirty(false);
+      const entry = selected === "arduino" ? name + ".ino" : "main/main.c";
+      const initialSource = await invoke<string>("workspace_read_file", { relativePath: entry });
+      setWorkspace(current); setCurrentPath(""); setActiveFile(entry); setEditorValue(initialSource); setDirty(false);
       await refreshWorkspace("");
       setFirmwareOutput("Created project at " + path); setBottomTab("Output");
     } catch (error) { const message = error instanceof Error ? error.message : String(error); setWorkspaceError(message); setAppNotice(message); }
