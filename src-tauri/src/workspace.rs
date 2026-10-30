@@ -30,7 +30,7 @@ pub struct WorkspaceEntry {
 }
 
 impl WorkspaceManager {
-    fn root(&self) -> Result<PathBuf, String> {
+    pub(crate) fn root(&self) -> Result<PathBuf, String> {
         self.root.lock()
             .map_err(|_| "Workspace state is unavailable".to_string())?
             .clone()

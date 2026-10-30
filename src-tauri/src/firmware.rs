@@ -29,7 +29,7 @@ pub fn firmware_create_project(name: String, framework: String) -> Result<String
     let root=parent.join(&name);
     if root.exists() { return Err(format!("A folder named {name} already exists at the selected location")); }
     fs::create_dir_all(&root).map_err(|e| format!("Could not create project directory: {e}"))?;
-    let result=(|| -> Result<(),String> {
+    let result=(|| -> std::io::Result<()> {
         fs::write(root.join(".gitignore"), "build/\n\.pio/\n\.vscode/\n*.bin\n*.elf\n")?;
         fs::write(root.join("README.md"), format!("# {name}\n\nCreated with APEX.\n\nFramework: {framework}\nTarget: generic Espressif ESP32 (verify the exact module and board before flashing).\n"))?;
         match framework.as_str() {
@@ -44,11 +44,11 @@ pub fn firmware_create_project(name: String, framework: String) -> Result<String
                 fs::write(root.join("main/main.c"), "#include <stdio.h>\n#include \"freertos/FreeRTOS.h\"\n#include \"freertos/task.h\"\n#include \"driver/gpio.h\"\n#include \"esp_log.h\"\n\n#define LED_GPIO GPIO_NUM_2 // Verify this pin against your board.\nstatic const char *TAG = \"apex\";\n\nvoid app_main(void) {\n    gpio_reset_pin(LED_GPIO);\n    gpio_set_direction(LED_GPIO, GPIO_MODE_OUTPUT);\n    ESP_LOGI(TAG, \"APEX firmware ready\");\n    while (1) {\n        gpio_set_level(LED_GPIO, 1);\n        vTaskDelay(pdMS_TO_TICKS(500));\n        gpio_set_level(LED_GPIO, 0);\n        vTaskDelay(pdMS_TO_TICKS(500));\n    }\n}\n")?;
                 fs::write(root.join("sdkconfig.defaults"), "CONFIG_IDF_TARGET=\"esp32\"\n")?;
             },
-            _ => return Err("Unsupported framework. Choose arduino or esp-idf.".into()),
+            _ => return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput, "Unsupported framework. Choose arduino or esp-idf.")),
         }
         Ok(())
     })();
-    if let Err(error)=result { let _=fs::remove_dir_all(&root); return Err(error); }
+    if let Err(error)=result { let _=fs::remove_dir_all(&root); return Err(error.to_string()); }
     Ok(root.to_string_lossy().into_owned())
 }
 
