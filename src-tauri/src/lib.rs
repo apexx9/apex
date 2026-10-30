@@ -1,8 +1,10 @@
 mod terminal;
 mod serial;
+mod workspace;
 
 use terminal::TerminalManager;
 use serial::SerialManager;
+use workspace::WorkspaceManager;
 
 #[tauri::command]
 fn app_version() -> &'static str {
@@ -25,6 +27,7 @@ pub fn run() {
     tauri::Builder::default()
         .manage(TerminalManager::default())
         .manage(SerialManager::default())
+        .manage(WorkspaceManager::default())
         .invoke_handler(tauri::generate_handler![
             app_version,
             terminal_default_cwd,
@@ -36,7 +39,14 @@ pub fn run() {
             serial::serial_list_ports,
             serial::serial_start,
             serial::serial_write,
-            serial::serial_stop
+            serial::serial_stop,
+            workspace::workspace_pick,
+            workspace::workspace_current,
+            workspace::workspace_list,
+            workspace::workspace_read_file,
+            workspace::workspace_write_file,
+            workspace::workspace_create_file,
+            workspace::workspace_create_directory
         ])
         .run(tauri::generate_context!())
         .expect("error while running APEX");
