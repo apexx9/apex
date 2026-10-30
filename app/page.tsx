@@ -47,6 +47,7 @@ type Tab = "explorer" | "boards" | "components" | "tools";
 type SerialPort = { name: string; portType: string; manufacturer?: string | null; product?: string | null; serialNumber?: string | null; vendorId?: number | null; productId?: number | null };
 type WorkspaceInfo = { name: string; path: string };
 type WorkspaceEntry = { name: string; relativePath: string; isDirectory: boolean; size: number | null };
+type FirmwareResult = { command: string; success: boolean; exitCode: number | null; output: string };
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("explorer");
@@ -63,9 +64,49 @@ export default function Home() {
   const [editorValue, setEditorValue] = useState(source);
   const [dirty, setDirty] = useState(false);
   const [workspaceError, setWorkspaceError] = useState("");
+  const [framework, setFramework] = useState<"arduino" | "esp-idf">("arduino");
+  const [firmwareOutput, setFirmwareOutput] = useState("");
+  const [firmwareBusy, setFirmwareBusy] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [createKind, setCreateKind] = useState<"file" | "directory">("file");
   const [newEntryName, setNewEntryName] = useState("");
+  const createProject = async () => {
+    if (!isTauri()) return;
+    const name = window.prompt("Project name (letters, numbers, hyphens and underscores):", "esp32-project");
+    if (!name) return;
+    const selected = window.prompt("Framework: enter arduino or esp-idf", framework);
+    if (selected !== "arduino" && selected !== "esp-idf") return;
+    setFramework(selected);
+    try {
+      const path = await invoke<string>("firmware_create_project", { name, framework: selected });
+      await invoke("workspace_open_path", { path });
+      const current = await invoke<WorkspaceInfo | null>("workspace_current");
+      setWorkspace(current); setCurrentPath(""); setActiveFile(""); setDirty(false);
+      await refreshWorkspace("");
+      setFirmwareOutput("Created project at " + path); setBottomTab("Output");
+    } catch (error) { setWorkspaceError(error instanceof Error ? error.message : String(error)); }
+  };
+  const buildFirmware = async () => {
+    if (!workspace || firmwareBusy) return;
+    setFirmwareBusy(true); setBottomTab("Output"); setFirmwareOutput("Building…");
+    try {
+      const result = await invoke<FirmwareResult>("firmware_build", { framework });
+      setFirmwareOutput(result.command + "\n\n" + result.output + "\n\n" + (result.success ? "BUILD SUCCEEDED" : "BUILD FAILED (exit " + result.exitCode + ")"));
+    } catch (error) { setFirmwareOutput(error instanceof Error ? error.message : String(error)); }
+    finally { setFirmwareBusy(false); }
+  };
+  const flashFirmware = async () => {
+    if (!workspace || !selectedPort || firmwareBusy) {
+      setFirmwareOutput("Select a serial port from Board Manager before flashing."); setBottomTab("Output"); return;
+    }
+    if (!window.confirm("Flash firmware to " + selectedPort + "? This will overwrite the program currently on the device.")) return;
+    setFirmwareBusy(true); setBottomTab("Output"); setFirmwareOutput("Flashing…");
+    try {
+      const result = await invoke<FirmwareResult>("firmware_flash", { framework, port: selectedPort });
+      setFirmwareOutput(result.command + "\n\n" + result.output + "\n\n" + (result.success ? "FLASH SUCCEEDED" : "FLASH FAILED (exit " + result.exitCode + ")"));
+    } catch (error) { setFirmwareOutput(error instanceof Error ? error.message : String(error)); }
+    finally { setFirmwareBusy(false); }
+  };
   const refreshWorkspace = async (path: string) => {
     try { setEntries(await invoke<WorkspaceEntry[]>("workspace_list", { relativePath: path })); setWorkspaceError(""); }
     catch (error) { setWorkspaceError(error instanceof Error ? error.message : String(error)); }
@@ -130,7 +171,7 @@ export default function Home() {
       <header className="titlebar" data-tauri-drag-region>
         <div className="brand"><div className="brand-mark">A</div><span>APEX</span><span className="brand-sub">EMBEDDED STUDIO</span></div>
         <div className="project-title"><Folder size={14}/> {workspace?.name || "No workspace"} <ChevronDown size={13}/></div>
-        <div className="title-actions"><span className="connection"><span/> No device connected</span><button aria-label="Minimize" onClick={() => isTauri() && void getCurrentWindow().minimize()}>—</button><button aria-label="Maximize" onClick={() => isTauri() && void getCurrentWindow().toggleMaximize()}>□</button><button aria-label="Close" onClick={() => isTauri() && void getCurrentWindow().close()}>×</button></div>
+        <div className="title-actions"><button className="subtle-button" onClick={() => void createProject()}>New project</button><span className="connection"><span/> No device connected</span><button aria-label="Minimize" onClick={() => isTauri() && void getCurrentWindow().minimize()}>—</button><button aria-label="Maximize" onClick={() => isTauri() && void getCurrentWindow().toggleMaximize()}>□</button><button aria-label="Close" onClick={() => isTauri() && void getCurrentWindow().close()}>×</button></div>
       </header>
       <div className="workspace">
         <nav className="activity">
@@ -163,12 +204,12 @@ export default function Home() {
           {activeTab === "components" && <div className="empty-state"><Blocks size={22}/><strong>Component manager</strong><span>Install and manage project dependencies from supported registries.</span></div>}
         </aside>
         <section className="editor-area">
-          <div className="tabs"><div className="file-tab"><FileCode2 size={14}/> {activeFile ? activeFile.split(/[\\/]/).pop() : "Welcome.cpp"} {dirty && <span className="dirty-dot"/>}</div><div className="editor-actions"><button title="Save file (Ctrl+S)" onClick={() => void saveFile()} disabled={!activeFile || !dirty}><Save size={15}/></button><button title="Build integration is not implemented yet" disabled><Hammer size={15}/></button><button title="Run integration is not implemented yet" disabled><Play size={15}/></button></div></div>
+          <div className="tabs"><div className="file-tab"><FileCode2 size={14}/> {activeFile ? activeFile.split(/[\\/]/).pop() : "Welcome.cpp"} {dirty && <span className="dirty-dot"/>}</div><div className="editor-actions"><button title="Save file (Ctrl+S)" onClick={() => void saveFile()} disabled={!activeFile || !dirty}><Save size={15}/></button><select aria-label="Firmware framework" value={framework} onChange={(event) => setFramework(event.target.value as "arduino" | "esp-idf")}><option value="arduino">Arduino</option><option value="esp-idf">ESP-IDF</option></select><button title="Build firmware" onClick={() => void buildFirmware()} disabled={!workspace || firmwareBusy}><Hammer size={15}/></button><button title="Flash firmware to selected serial port" onClick={() => void flashFirmware()} disabled={!workspace || firmwareBusy}><Play size={15}/></button></div></div>
           <div className="breadcrumbs">{workspace?.name || "Welcome"} <span>/</span> {activeFile || "Select a file from the explorer"}</div>
           <div className="editor"><Editor height="100%" language={activeFile.endsWith(".py") ? "python" : activeFile.endsWith(".json") ? "json" : activeFile.endsWith(".md") ? "markdown" : "cpp"} value={editorValue} onChange={(value) => { setEditorValue(value ?? ""); setDirty(true); }} theme="vs-dark" options={{ minimap: { enabled: false }, fontSize: 13, fontFamily: "Cascadia Code, Consolas, monospace", lineNumbers: "on", scrollBeyondLastLine: false, automaticLayout: true, tabSize: 4, padding: { top: 16 }, renderLineHighlight: "all", readOnly: !activeFile }}/></div>
           <div className="bottom-panel">
             <div className="panel-tabs">{["PROBLEMS", "OUTPUT", "DEBUG CONSOLE", "SERIAL MONITOR", "TERMINAL"].map((name) => <button key={name} className={bottomTab.toUpperCase() === name ? "current" : ""} onClick={() => setBottomTab(name[0] + name.slice(1).toLowerCase())}>{name}</button>)}<Plus size={14}/><div className="panel-spacer"/><ChevronDown size={14}/><X size={14}/></div>
-            {bottomTab === "Terminal" ? <TerminalPanel /> : bottomTab === "Serial monitor" && selectedPort ? <SerialMonitorPanel key={selectedPort} portName={selectedPort} /> : <div className="panel-placeholder">{bottomTab} panel is not implemented yet.</div>}
+            {bottomTab === "Terminal" ? <TerminalPanel /> : bottomTab === "Serial monitor" && selectedPort ? <SerialMonitorPanel key={selectedPort} portName={selectedPort} /> : bottomTab === "Output" ? <pre className="firmware-output">{firmwareOutput || "Build and flash output will appear here."}</pre> : <div className="panel-placeholder">{bottomTab} panel is not implemented yet.</div>}
           </div>
         </section>
       </div>

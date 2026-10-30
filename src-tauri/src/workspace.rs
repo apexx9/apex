@@ -94,6 +94,11 @@ pub fn workspace_pick(manager: State<'_, WorkspaceManager>) -> Result<Option<Wor
 }
 
 #[tauri::command]
+pub fn workspace_open_path(manager: State<'_, WorkspaceManager>, path: String) -> Result<WorkspaceInfo, String> {
+    manager.set_root(PathBuf::from(path))
+}
+
+#[tauri::command]
 pub fn workspace_current(manager: State<'_, WorkspaceManager>) -> Result<Option<WorkspaceInfo>, String> {
     let root = manager.root.lock().map_err(|_| "Workspace state is unavailable")?.clone();
     Ok(root.map(|path| WorkspaceInfo {

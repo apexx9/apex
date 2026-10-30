@@ -43,6 +43,7 @@ pub fn run() {
             serial::serial_write,
             serial::serial_stop,
             workspace::workspace_pick,
+            workspace::workspace_open_path,
             workspace::workspace_current,
             workspace::workspace_list,
             workspace::workspace_read_file,
