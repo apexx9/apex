@@ -99,7 +99,7 @@ pub fn firmware_flash(manager: State<'_,WorkspaceManager>, framework: String, po
     if port.trim().is_empty() || port.len()>128 || port.chars().any(|c| c.is_control()) {
         return Err("Select a valid serial port before flashing".into());
     }
-    let root=active_project(&manager)?;
+    let root=active_project(&manager, &framework)?;
     match framework.as_str() {
         "arduino" => run_in_project(&root,"arduino-cli",&["compile".into(),"--fqbn".into(),"esp32:esp32:esp32".into(),"--upload".into(),"--port".into(),port,".".into()]),
         "esp-idf" => run_in_project(&root,"idf.py",&["-p".into(),port,"flash".into()]),
