@@ -39,7 +39,7 @@ export function ToolchainPanel() {
   useEffect(() => { void scan(); }, []);
 
   const installed = tools.filter((tool) => tool.installed).length;
-  const install = async (id:string) => { setInstalling(id); setInstallOutput(""); try { const result=await invoke<{success:boolean;output:string;command:string}>("toolchain_install",{tool:id}); setInstallOutput(result.command+"\n"+result.output); await scan(); } catch(e) { setInstallOutput(String(e)); } finally { setInstalling(""); } };
+  const install = async (id:string) => { if (!window.confirm(`Install ${id} using Windows Package Manager (winget)? This may download software and modify your Windows environment.`)) return; setInstalling(id); setInstallOutput(""); try { const result=await invoke<{success:boolean;output:string;command:string}>("toolchain_install",{tool:id}); setInstallOutput(result.command+"\n"+result.output); await scan(); } catch(e) { setInstallOutput(String(e)); } finally { setInstalling(""); } };
 
   return (
     <section className="toolchain-panel">
