@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #101113; color: #e4e6e8; font-family: Inter, "Segoe UI", sans-serif; }
+button { color: inherit; font: inherit; cursor: pointer; }
+.ide { height: 100vh; display: flex; flex-direction: column; background: #101113; font-size: 12px; }
+.titlebar { height: 42px; flex: 0 0 42px; display: flex; align-items: center; border-bottom: 1px solid #292c30; background: #151719; -webkit-app-region: drag; }
+.brand { display: flex; align-items: center; gap: 9px; padding: 0 15px; font-size: 12px; font-weight: 700; letter-spacing: 1.3px; }
+.brand-mark { display: grid; place-items: center; width: 21px; height: 21px; background: #d6f36a; color: #161914; font-size: 14px; font-weight: 800; letter-spacing: -1px; }
+.brand-sub { color: #737981; font-size: 9px; letter-spacing: 1px; font-weight: 500; margin-left: 3px; }
+.project-title { display: flex; align-items: center; gap: 8px; margin: auto; color: #b9bec4; }
+.title-actions { display: flex; align-items: center; gap: 13px; padding-right: 13px; color: #969da5; }
+.title-actions button { border: 0; background: transparent; font-size: 16px; width: 22px; -webkit-app-region: no-drag; }
+.connection { display: flex; align-items: center; gap: 7px; margin-right: 12px; font-size: 11px; }
+.connection span { width: 6px; height: 6px; border-radius: 50%; background: #737981; }
+.workspace { min-height: 0; flex: 1; display: flex; }
+.activity { width: 49px; flex: 0 0 49px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 0; border-right: 1px solid #292c30; background: #141618; }
+.activity button, .editor-actions button { border: 0; background: transparent; color: #777f88; display: grid; place-items: center; width: 34px; height: 34px; }
+.activity button svg { width: 18px; height: 18px; stroke-width: 1.7; }
+.activity button.selected { color: #e7e9eb; border-left: 2px solid #d6f36a; }
+.activity-spacer, .panel-spacer { flex: 1; }
+.sidebar { width: 236px; flex: 0 0 236px; border-right: 1px solid #292c30; background: #151719; }
+.side-heading { height: 40px; display: flex; justify-content: space-between; align-items: center; padding: 0 14px; color: #aeb4bb; font-size: 10px; font-weight: 600; letter-spacing: .8px; }
+.tree-root, .tree-item { height: 28px; display: flex; align-items: center; gap: 8px; padding: 0 11px; color: #b8bec5; }
+.tree-root { font-size: 10px; font-weight: 700; letter-spacing: .5px; }
+.tree-item { padding-left: 23px; color: #9da4ac; }
+.tree-item.indent { padding-left: 28px; }
+.tree-item.active { background: #24282c; color: #e5e8eb; }
+.tree-item svg, .tree-root svg { color: #8d969f; }
+.side-section { margin-top: 20px; padding: 10px 13px; border-top: 1px solid #25292d; color: #858c94; font-size: 10px; font-weight: 600; letter-spacing: .8px; }
+.muted-item { color: #727982; padding-left: 43px !important; }
+.editor-area { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+.tabs { height: 39px; flex: 0 0 39px; display: flex; align-items: stretch; justify-content: space-between; background: #151719; border-bottom: 1px solid #292c30; }
+.file-tab { display: flex; align-items: center; gap: 9px; min-width: 130px; padding: 0 13px; border-right: 1px solid #292c30; border-top: 1px solid #d6f36a; color: #dfe2e5; }
+.file-tab svg:first-child { color: #8da9d7; }
+.dirty-dot { width: 6px; height: 6px; border-radius: 50%; background: #d6f36a; margin-left: auto; }
+.editor-actions { display: flex; align-items: center; padding: 0 9px; gap: 3px; }
+.breadcrumbs { height: 29px; flex: 0 0 29px; display: flex; align-items: center; gap: 9px; padding: 0 17px; color: #9da4ac; background: #101113; }
+.breadcrumbs span { color: #51575e; }
+.editor { min-height: 0; flex: 1; }
+.bottom-panel { height: 220px; flex: 0 0 220px; border-top: 1px solid #292c30; background: #111315; display: flex; flex-direction: column; }
+.panel-tabs { height: 37px; flex: 0 0 37px; display: flex; align-items: center; gap: 19px; padding: 0 14px; border-bottom: 1px solid #25292d; color: #7e858d; }
+.panel-tabs button { height: 100%; border: 0; background: transparent; color: #858c94; font-size: 10px; letter-spacing: .4px; }
+.panel-tabs button.current { color: #e1e4e7; border-bottom: 1px solid #d6f36a; }
+.terminal-content { padding: 10px 15px; overflow: auto; color: #b8bec5; font-family: "JetBrains Mono", Consolas, monospace; font-size: 11px; }
+.terminal-label { display: flex; align-items: center; gap: 7px; color: #89919a; font-size: 10px; margin-bottom: 12px; }
+.terminal-content pre { font: inherit; line-height: 1.8; white-space: pre-wrap; }
+.prompt { color: #d6f36a; }
+.cursor { display: inline-block; width: 7px; height: 13px; vertical-align: -2px; background: #d6f36a; opacity: .8; }
+.statusbar { height: 23px; flex: 0 0 23px; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; background: #202a19; color: #d4e4b3; font-size: 10px; }
+.statusbar div { display: flex; align-items: center; gap: 10px; }
+.statusbar span { color: #a5b58a; }
+.empty-state { padding: 30px 18px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; color: #838b93; line-height: 1.6; }
+.empty-state strong { color: #cdd2d7; font-size: 12px; }
+.empty-state span { font-size: 11px; }
+.subtle-button { border: 1px solid #363c42; background: #202429; padding: 6px 9px; font-size: 11px; }
+.welcome-toast { position: fixed; right: 18px; bottom: 42px; display: flex; align-items: flex-start; gap: 12px; width: 320px; padding: 14px; border: 1px solid #343a40; background: #1b1f22; box-shadow: 0 12px 40px #0008; }
+.welcome-icon { display: grid; place-items: center; width: 32px; height: 32px; background: #2a3020; color: #d6f36a; }
+.welcome-toast strong { font-size: 12px; }
+.welcome-toast p { margin: 5px 0 0; color: #929aa2; font-size: 11px; line-height: 1.5; }
+.welcome-toast button { margin-left: auto; border: 0; background: transparent; color: #858c94; }
