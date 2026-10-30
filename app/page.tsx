@@ -19,8 +19,10 @@ const SerialMonitorPanel = dynamic(() => import("@/frontend/components/SerialMon
 });
 import { ToolchainPanel } from "@/frontend/components/ToolchainPanel";
 import { ComponentPanel } from "@/frontend/components/ComponentPanel";
+import { BoardPanel } from "@/frontend/components/BoardPanel";
+import { DebugPanel } from "@/frontend/components/DebugPanel";
 import {
-  Activity, AppWindow, Blocks, ChevronDown, ChevronRight, CircleHelp,
+  Activity, AppWindow, Blocks, Bug, ChevronDown, ChevronRight, CircleHelp,
   Code2, Cpu, FileCode2, Folder, FolderOpen, GitBranch, Hammer, Layers3,
   ListTree, Monitor, Play, Plus, Search, Settings2, TerminalSquare,
   Usb, X, Save, FilePlus, FolderPlus, ArrowLeft, Wrench,
@@ -44,7 +46,7 @@ void loop() {
 }
 `;
 
-type Tab = "explorer" | "boards" | "components" | "tools";
+type Tab = "explorer" | "boards" | "components" | "tools" | "debug";
 type SerialPort = { name: string; portType: string; manufacturer?: string | null; product?: string | null; serialNumber?: string | null; vendorId?: number | null; productId?: number | null };
 type WorkspaceInfo = { name: string; path: string };
 type WorkspaceEntry = { name: string; relativePath: string; isDirectory: boolean; size: number | null };
@@ -181,12 +183,13 @@ export default function Home() {
           <button className={activeTab === "boards" ? "selected" : ""} onClick={() => { setActiveTab("boards"); void refreshPorts(); }} title="Boards"><Cpu/></button>
           <button className={activeTab === "components" ? "selected" : ""} onClick={() => setActiveTab("components")} title="Components"><Blocks/></button>
           <button className={activeTab === "tools" ? "selected" : ""} onClick={() => setActiveTab("tools")} title="Toolchains"><Wrench/></button>
+          <button className={activeTab === "debug" ? "selected" : ""} onClick={() => setActiveTab("debug")} title="JTAG Debug"><Bug/></button>
           <div className="activity-spacer"/>
           <button title="Settings"><Settings2/></button>
           <button title="Help"><CircleHelp/></button>
         </nav>
         <aside className="sidebar">
-          <div className="side-heading"><span>{activeTab === "explorer" ? "EXPLORER" : activeTab === "boards" ? "BOARD MANAGER" : activeTab === "tools" ? "TOOLCHAINS" : "COMPONENTS"}</span>{activeTab === "explorer" ? <div className="explorer-actions"><button onClick={() => void openWorkspace()} title="Open workspace"><FolderOpen size={14}/></button><button onClick={() => { setCreateKind("file"); setShowCreate(true); }} disabled={!workspace} title="New file"><FilePlus size={14}/></button><button onClick={() => { setCreateKind("directory"); setShowCreate(true); }} disabled={!workspace} title="New folder"><FolderPlus size={14}/></button></div> : <Search size={14}/>}</div>
+          <div className="side-heading"><span>{activeTab === "explorer" ? "EXPLORER" : activeTab === "boards" ? "BOARD MANAGER" : activeTab === "tools" ? "TOOLCHAINS" : activeTab === "debug" ? "DEBUG" : "COMPONENTS"}</span>{activeTab === "explorer" ? <div className="explorer-actions"><button onClick={() => void openWorkspace()} title="Open workspace"><FolderOpen size={14}/></button><button onClick={() => { setCreateKind("file"); setShowCreate(true); }} disabled={!workspace} title="New file"><FilePlus size={14}/></button><button onClick={() => { setCreateKind("directory"); setShowCreate(true); }} disabled={!workspace} title="New folder"><FolderPlus size={14}/></button></div> : <Search size={14}/>}</div>
           {activeTab === "explorer" && <>
             <div className="tree-root"><FolderOpen size={15}/> {workspace?.name || "NO WORKSPACE"}</div>
             {workspace && currentPath && <button className="tree-back" onClick={() => { const parent = currentPath.replace(/[\\/][^\\/]+$/, ""); setCurrentPath(parent); void refreshWorkspace(parent); }}><ArrowLeft size={13}/> Back</button>}
@@ -196,12 +199,13 @@ export default function Home() {
             {workspace && entries.map((entry) => <button key={entry.relativePath} className={activeFile === entry.relativePath ? "tree-item dynamic active" : "tree-item dynamic"} onClick={() => void openEntry(entry)}>{entry.isDirectory ? <Folder size={15}/> : <FileCode2 size={15}/>}<span>{entry.name}</span></button>)}
             {workspace && entries.length === 0 && <div className="empty-state"><span>This folder is empty.</span></div>}
           </>}
-          {activeTab === "boards" && <div className="board-manager">
+          {activeTab === "boards" && <><BoardPanel framework={framework}/><div className="board-manager">
             <div className="board-intro"><Cpu size={22}/><strong>Detected serial ports</strong><span>Port presence does not confirm board identity. Select a port only after verifying your hardware.</span><button className="subtle-button" onClick={() => void refreshPorts()} disabled={portsLoading}>{portsLoading ? "Scanning…" : "Refresh ports"}</button></div>
             {portsError && <div className="port-error">{portsError}</div>}
             {ports.length === 0 && !portsLoading && !portsError && <div className="port-empty">No serial ports found.</div>}
             {ports.map((port) => <div className="port-card" key={port.name}><div className="port-icon"><Usb size={15}/></div><div className="port-details"><strong>{port.name}</strong><span>{port.product || port.manufacturer || port.portType.toUpperCase()}</span>{port.vendorId != null && port.productId != null && <small>VID {port.vendorId.toString(16).padStart(4,"0").toUpperCase()} · PID {port.productId.toString(16).padStart(4,"0").toUpperCase()}</small>}</div><button className="port-monitor-button" onClick={() => { setSelectedPort(port.name); setBottomTab("Serial monitor"); }}>Monitor</button></div>)}
-          </div>}
+          </div></>}
+          {activeTab === "debug" && <DebugPanel/>}
           {activeTab === "tools" && <ToolchainPanel />}
           {activeTab === "components" && <ComponentPanel framework={framework} />}
         </aside>
