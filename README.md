@@ -10,7 +10,8 @@ APEX is in active development. Phase 1 establishes the Tauri 2 + Rust desktop sh
 
 ## Architecture
 
-- `frontend/` — Next.js static-export React application.
+- `app/` — Next.js App Router application.
+- `frontend/components/` — reusable React workspace components.
 - `src-tauri/` — Tauri 2 desktop shell and native Rust services.
 - `docs/` — architecture, setup and implementation notes.
 - `tests/` — acceptance and integration test plans.
