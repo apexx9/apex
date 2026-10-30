@@ -92,3 +92,10 @@ pub fn firmware_flash(manager: State<'_,WorkspaceManager>, framework: String, po
         _ => Err("Unsupported framework".into())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::safe_project_name;
+    #[test] fn accepts_simple_project_names() { assert_eq!(safe_project_name("robot_firmware").unwrap(), "robot_firmware"); }
+    #[test] fn rejects_path_traversal_and_shell_characters() { assert!(safe_project_name("../firmware").is_err()); assert!(safe_project_name("firmware;whoami").is_err()); }
+}

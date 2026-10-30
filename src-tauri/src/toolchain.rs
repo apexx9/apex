@@ -42,7 +42,7 @@ fn read_version(path: &PathBuf, executable: &str) -> Option<String> {
 
 #[tauri::command]
 pub fn toolchain_scan() -> Vec<ToolchainItem> {
-    let definitions: [(&'static str, &'static str, &'static str, &'static str); 11] = [
+    let definitions: [(&'static str, &'static str, &'static str, &'static str); 13] = [
         ("python", "Python", "python", "ESP-IDF, scripts and tooling"),
         ("cmake", "CMake", "cmake", "ESP-IDF and CMake projects"),
         ("ninja", "Ninja", "ninja", "ESP-IDF build system"),
@@ -54,6 +54,8 @@ pub fn toolchain_scan() -> Vec<ToolchainItem> {
         ("xtensa-gdb", "Xtensa GDB", "xtensa-esp32-elf-gdb", "Original ESP32 debugger"),
         ("riscv-gcc", "RISC-V ESP GCC", "riscv32-esp-elf-gcc", "RISC-V ESP32-family targets"),
         ("riscv-gdb", "RISC-V ESP GDB", "riscv32-esp-elf-gdb", "RISC-V ESP32-family debugging"),
+        ("arduino-cli", "Arduino CLI", "arduino-cli", "Arduino framework compile and upload"),
+        ("platformio", "PlatformIO CLI", "pio", "PlatformIO project builds and uploads"),
     ];
 
     definitions.into_iter().map(|(id, label, executable, required_for)| {

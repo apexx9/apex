@@ -205,3 +205,10 @@ pub fn workspace_create_directory(
     let path = resolve_new(&root, &relative_path)?;
     fs::create_dir(path).map_err(|error| format!("Could not create directory: {error}"))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::validate_relative;
+    #[test] fn allows_workspace_relative_paths() { assert!(validate_relative("src/main.c").is_ok()); }
+    #[test] fn rejects_parent_and_absolute_paths() { assert!(validate_relative("../secret").is_err()); assert!(validate_relative("C:\\secret").is_err()); }
+}
