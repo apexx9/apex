@@ -18,3 +18,4 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 portable-pty = "0.8"
 serialport = { version = "4.7", default-features = false }
+rfd = "0.15"
