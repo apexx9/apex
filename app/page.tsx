@@ -18,6 +18,7 @@ const SerialMonitorPanel = dynamic(() => import("@/frontend/components/SerialMon
   loading: () => <div className="panel-placeholder">Loading serial monitor…</div>,
 });
 import { ToolchainPanel } from "@/frontend/components/ToolchainPanel";
+import { ComponentPanel } from "@/frontend/components/ComponentPanel";
 import {
   Activity, AppWindow, Blocks, ChevronDown, ChevronRight, CircleHelp,
   Code2, Cpu, FileCode2, Folder, FolderOpen, GitBranch, Hammer, Layers3,
@@ -201,7 +202,7 @@ export default function Home() {
             {ports.map((port) => <div className="port-card" key={port.name}><div className="port-icon"><Usb size={15}/></div><div className="port-details"><strong>{port.name}</strong><span>{port.product || port.manufacturer || port.portType.toUpperCase()}</span>{port.vendorId != null && port.productId != null && <small>VID {port.vendorId.toString(16).padStart(4,"0").toUpperCase()} · PID {port.productId.toString(16).padStart(4,"0").toUpperCase()}</small>}</div><button className="port-monitor-button" onClick={() => { setSelectedPort(port.name); setBottomTab("Serial monitor"); }}>Monitor</button></div>)}
           </div>}
           {activeTab === "tools" && <ToolchainPanel />}
-          {activeTab === "components" && <div className="empty-state"><Blocks size={22}/><strong>Component manager</strong><span>Install and manage project dependencies from supported registries.</span></div>}
+          {activeTab === "components" && <ComponentPanel framework={framework} />}
         </aside>
         <section className="editor-area">
           <div className="tabs"><div className="file-tab"><FileCode2 size={14}/> {activeFile ? activeFile.split(/[\\/]/).pop() : "Welcome.cpp"} {dirty && <span className="dirty-dot"/>}</div><div className="editor-actions"><button title="Save file (Ctrl+S)" onClick={() => void saveFile()} disabled={!activeFile || !dirty}><Save size={15}/></button><select aria-label="Firmware framework" value={framework} onChange={(event) => setFramework(event.target.value as "arduino" | "esp-idf")}><option value="arduino">Arduino</option><option value="esp-idf">ESP-IDF</option></select><button title="Build firmware" onClick={() => void buildFirmware()} disabled={!workspace || firmwareBusy}><Hammer size={15}/></button><button title="Flash firmware to selected serial port" onClick={() => void flashFirmware()} disabled={!workspace || firmwareBusy}><Play size={15}/></button></div></div>
