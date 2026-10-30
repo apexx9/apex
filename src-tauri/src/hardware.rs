@@ -60,10 +60,35 @@ pub fn peripheral_generate(peripheral: String, pins: Vec<u8>, framework: String)
     };
     if !expected { return Err("Choose GPIO, UART, I2C, SPI, PWM, ADC, DAC or CAN/TWAI.".into()); }
     if !matches!(framework.as_str(),"arduino"|"esp-idf") { return Err("Unsupported firmware framework".into()); }
-    if pins.iter().any(|p| *p>39 || matches!(*p,6..=11)) { return Err("One or more GPIOs are outside the exposed classic ESP32 GPIO range or reserved for flash.".into()); }
+    let required_pins = match peripheral.as_str() {
+        "gpio"|"pwm"|"adc"|"dac" => 1,
+        "i2c"|"uart"|"can" => 2,
+        "spi" => 4,
+        _ => unreachable!(),
+    };
+    if pins.len() != required_pins {
+        let signals = match peripheral.as_str() {
+            "gpio"|"pwm"|"adc"|"dac" => "exactly one GPIO",
+            "i2c" => "two GPIOs in SDA, SCL order",
+            "uart" => "two GPIOs in RX, TX order",
+            "can" => "two GPIOs in TX, RX order",
+            "spi" => "four GPIOs in SCLK, MISO, MOSI, CS order",
+            _ => "the required GPIOs",
+        };
+        return Err(format!("{} requires {}; {} selected.", peripheral.to_uppercase(), signals, pins.len()));
+    }
+    if pins.iter().any(|p| *p>39 || matches!(*p,6..=11|20|24|28..=31)) {
+        return Err("One or more GPIOs are invalid, unbonded, or reserved for flash on the classic ESP32.".into());
+    }
+    if peripheral=="dac" && pins.iter().any(|p| !matches!(*p,25|26)) {
+        return Err("Classic ESP32 DAC outputs are GPIO25 (DAC1) and GPIO26 (DAC2) only.".into());
+    }
+    if peripheral=="adc" && pins.iter().any(|p| !(32..=39).contains(p) && !matches!(*p,0|2|4|12..=15|25..=27)) {
+        return Err("Selected pin does not expose an ADC channel on the classic ESP32.".into());
+    }
     let mut conflicts=Vec::new(); let mut warnings=Vec::new();
     let unique: std::collections::HashSet<u8> = pins.iter().copied().collect();
-    if unique.len()!=pins.len() { conflicts.push("The same GPIO is assigned more than once.".into()); }
+    if unique.len()!=pins.len() { return Err("The same GPIO cannot be assigned to multiple signals.".into()); }
     for p in &pins {
         if (34..=39).contains(p) && matches!(peripheral.as_str(),"gpio"|"pwm"|"spi"|"i2c"|"uart"|"can"|"dac") {
             conflicts.push(format!("GPIO{p} is input-only and cannot be used for this output-capable signal."));
@@ -88,7 +113,7 @@ pub fn peripheral_generate(peripheral: String, pins: Vec<u8>, framework: String)
         ("arduino","pwm") => format!("constexpr int PWM_PIN = {};\nvoid setup() {{ pinMode(PWM_PIN, OUTPUT); }}\nvoid loop() {{ for(int d=0; d<=255; ++d) {{ analogWrite(PWM_PIN,d); delay(8); }} }}",p(0)),
         ("arduino","adc") => format!("void setup() {{ Serial.begin(115200); }}\nvoid loop() {{ Serial.printf(\"GPIO{} ADC: %d\\n\", analogRead({})); delay(500); }}",p(0),p(0)),
         ("arduino","dac") => format!("void setup() {{}}\nvoid loop() {{ for(int v=0;v<256;v++) dacWrite({},v); for(int v=255;v>=0;v--) dacWrite({},v); }}",p(0),p(0)),
-        ("arduino","spi") => format!("#include <SPI.h>\nvoid setup() {{ SPI.begin({},-1,-1,{}); pinMode({},OUTPUT); digitalWrite({},HIGH); }}\nvoid loop() {{ digitalWrite({},LOW); SPI.transfer(0x9F); digitalWrite({},HIGH); delay(1000); }}",p(0),p(1),p(1),p(1),p(1),p(1)),
+        ("arduino","spi") => format!("#include <SPI.h>\nconstexpr int APEX_SCLK = {};\nconstexpr int APEX_MISO = {};\nconstexpr int APEX_MOSI = {};\nconstexpr int APEX_CS = {};\nvoid setup() {{ SPI.begin(APEX_SCLK, APEX_MISO, APEX_MOSI, APEX_CS); pinMode(APEX_CS, OUTPUT); digitalWrite(APEX_CS, HIGH); }}\nvoid loop() {{ digitalWrite(APEX_CS, LOW); SPI.transfer(0x9F); digitalWrite(APEX_CS, HIGH); delay(1000); }}",p(0),p(1),p(2),p(3)),
         ("arduino","can") => format!("#include <ESP32-TWAI-CAN.hpp>\n// Install ESP32-TWAI-CAN library. Confirm transceiver wiring and bus termination.\nvoid setup() {{ Serial.begin(115200); ESP32Can.setPins({}, {}); ESP32Can.setSpeed(ESP32Can.convertSpeed(500)); ESP32Can.begin(); }}\nvoid loop() {{ CanFrame frame; if (ESP32Can.readFrame(frame, 1000)) Serial.println(\"CAN frame received\"); }}",p(0),p(1)),
         ("esp-idf","gpio") => format!("#include \"driver/gpio.h\"\n#define APEX_GPIO GPIO_NUM_{}\nvoid app_main(void) {{ gpio_reset_pin(APEX_GPIO); gpio_set_direction(APEX_GPIO, GPIO_MODE_OUTPUT); gpio_set_level(APEX_GPIO, 1); }}",p(0)),
         ("esp-idf","i2c") => format!("// ESP-IDF 5.x: configure an I2C master bus with these pins.\n#include \"driver/i2c_master.h\"\n#define APEX_I2C_SDA GPIO_NUM_{}\n#define APEX_I2C_SCL GPIO_NUM_{}\n// Create bus with i2c_new_master_bus(); scan addresses using probe API.",p(0),p(1)),
@@ -100,8 +125,5 @@ pub fn peripheral_generate(peripheral: String, pins: Vec<u8>, framework: String)
         ("esp-idf","can") => format!("#include \"driver/twai.h\"\n#define APEX_TWAI_TX GPIO_NUM_{}\n#define APEX_TWAI_RX GPIO_NUM_{}\n// Configure TWAI general/timing/filter config, install driver, then start.",p(0),p(1)),
         _ => unreachable!()
     };
-    if matches!(peripheral.as_str(),"i2c"|"uart"|"spi"|"can") && pins.len()<2 {
-        warnings.push("This peripheral normally needs at least two signal pins; assign clock/data or TX/RX pins before wiring.".into());
-    }
     Ok(PeripheralResult { code, conflicts, warnings, summary:format!("{} configuration for {} using GPIO {:?}",peripheral.to_uppercase(),framework,pins) })
 }
