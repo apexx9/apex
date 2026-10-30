@@ -1,5 +1,9 @@
 name: Windows desktop build
 
+concurrency:
+  group: apex-windows-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main]
@@ -26,6 +30,11 @@ jobs:
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ./src-tauri -> target
 
       - name: Install frontend dependencies
         run: pnpm install
