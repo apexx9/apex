@@ -84,7 +84,7 @@ pub fn peripheral_generate(peripheral: String, pins: Vec<u8>, framework: String)
     let code = match (framework.as_str(),peripheral.as_str()) {
         ("arduino","gpio") => format!("constexpr int APEX_GPIO = {};\nvoid setup() {{ pinMode(APEX_GPIO, OUTPUT); }}\nvoid loop() {{ digitalWrite(APEX_GPIO, HIGH); delay(500); digitalWrite(APEX_GPIO, LOW); delay(500); }}",p(0)),
         ("arduino","i2c") => format!("#include <Wire.h>\nvoid setup() {{ Wire.begin({}, {}); Serial.begin(115200); }}\nvoid loop() {{ for (uint8_t a=1; a<127; ++a) {{ Wire.beginTransmission(a); if (Wire.endTransmission()==0) Serial.printf(\"I2C: 0x%02X\\n\",a); }} delay(3000); }}",p(0),p(1)),
-        ("arduino","uart") => format("#include <HardwareSerial.h>\nHardwareSerial ApexUart(1);\nvoid setup() {{ Serial.begin(115200); ApexUart.begin(9600, SERIAL_8N1, {}, {}); }}\nvoid loop() {{ while(ApexUart.available()) Serial.write(ApexUart.read()); }}",p(0),p(1)),
+        ("arduino","uart") => format!("#include <HardwareSerial.h>\nHardwareSerial ApexUart(1);\nvoid setup() {{ Serial.begin(115200); ApexUart.begin(9600, SERIAL_8N1, {}, {}); }}\nvoid loop() {{ while(ApexUart.available()) Serial.write(ApexUart.read()); }}",p(0),p(1)),
         ("arduino","pwm") => format("constexpr int PWM_PIN = {};\nvoid setup() {{ pinMode(PWM_PIN, OUTPUT); }}\nvoid loop() {{ for(int d=0; d<=255; ++d) {{ analogWrite(PWM_PIN,d); delay(8); }} }}",p(0)),
         ("arduino","adc") => format("void setup() {{ Serial.begin(115200); }}\nvoid loop() {{ Serial.printf(\"GPIO{} ADC: %d\\n\", analogRead({})); delay(500); }}",p(0),p(0)),
         ("arduino","dac") => format("void setup() {{}}\nvoid loop() {{ for(int v=0;v<256;v++) dacWrite({},v); for(int v=255;v>=0;v--) dacWrite({},v); }}",p(0),p(0)),
