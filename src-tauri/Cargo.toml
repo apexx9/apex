@@ -1,6 +1,6 @@
 [package]
 name = "apex"
-version = "0.1.0"
+version = "0.1.1"
 description = "APEX embedded systems IDE"
 authors = ["Apex"]
 edition = "2021"
