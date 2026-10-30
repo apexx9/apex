@@ -2,6 +2,7 @@ mod terminal;
 mod serial;
 mod workspace;
 mod toolchain;
+mod firmware;
 
 use terminal::TerminalManager;
 use serial::SerialManager;
@@ -48,7 +49,10 @@ pub fn run() {
             workspace::workspace_write_file,
             workspace::workspace_create_file,
             workspace::workspace_create_directory,
-            toolchain::toolchain_scan
+            toolchain::toolchain_scan,
+            firmware::firmware_create_project,
+            firmware::firmware_build,
+            firmware::firmware_flash
         ])
         .run(tauri::generate_context!())
         .expect("error while running APEX");
