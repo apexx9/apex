@@ -130,7 +130,7 @@ pub fn serial_start(
         let mut buffer = [0_u8; 2048];
         while !thread_stop.load(Ordering::Relaxed) {
             match reader.read(&mut buffer) {
-                Ok(0) => continue,
+                Ok(0) => thread::sleep(Duration::from_millis(10)),
                 Ok(count) => {
                     let text = String::from_utf8_lossy(&buffer[..count]).into_owned();
                     if app_handle.emit("apex://serial-output", SerialOutput {
