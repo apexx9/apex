@@ -66,8 +66,8 @@ export default function Home() {
   const [activeFile, setActiveFile] = useState("");
   const [editorValue, setEditorValue] = useState(source);
   const [dirty, setDirty] = useState(false);
-  const [editorReady, setEditorReady] = useState(false);
   const [workspaceError, setWorkspaceError] = useState("");
+  const [appNotice, setAppNotice] = useState("");
   const [framework, setFramework] = useState<"arduino" | "esp-idf">("arduino");
   const [firmwareOutput, setFirmwareOutput] = useState("");
   const [firmwareBusy, setFirmwareBusy] = useState(false);
@@ -161,7 +161,6 @@ export default function Home() {
         setActiveFile(relativePath);
         setEditorValue("");
         setDirty(false);
-        setEditorReady(false);
       }
     } catch (error) { setWorkspaceError(error instanceof Error ? error.message : String(error)); }
   };
@@ -218,8 +217,8 @@ export default function Home() {
           <button className={activeTab === "tools" ? "selected" : ""} onClick={() => setActiveTab("tools")} title="Toolchains"><Wrench/></button>
           <button className={activeTab === "debug" ? "selected" : ""} onClick={() => setActiveTab("debug")} title="JTAG Debug"><Bug/></button>
           <div className="activity-spacer"/>
-          <button title="Settings" onClick={() => { setActiveTab("tools"); setWorkspaceError("Settings: configure installed toolchains in this workspace. Additional editor preferences are not yet available."); }}><Settings2/></button>
-          <button title="Help" onClick={() => setWorkspaceError("APEX help: open a workspace, create or open a source file, edit it in the editor, then use Build and Flash. For USB detection, check Device Manager and install the board's USB-to-UART driver if needed.")}><CircleHelp/></button>
+          <button title="Settings" onClick={() => { setActiveTab("tools"); setAppNotice("Settings currently opens the toolchain configuration workspace. More editor preferences are planned."); }}><Settings2/></button>
+          <button title="Help" onClick={() => setAppNotice("APEX quick help: open a workspace, create or open a source file, edit it in the editor, then use Build and Flash. For USB detection, check Device Manager and install the board's USB-to-UART driver if needed.")}><CircleHelp/></button>
         </nav>
         <aside className="sidebar">
           <div className="side-heading"><span>{activeTab === "explorer" ? "EXPLORER" : activeTab === "boards" ? "BOARD MANAGER" : activeTab === "tools" ? "TOOLCHAINS" : activeTab === "debug" ? "DEBUG" : "COMPONENTS"}</span>{activeTab === "explorer" ? <div className="explorer-actions"><button onClick={() => void openWorkspace()} title="Open workspace"><FolderOpen size={14}/></button><button onClick={() => { setCreateKind("file"); setShowCreate(true); }} disabled={!workspace} title="New file"><FilePlus size={14}/></button><button onClick={() => { setCreateKind("directory"); setShowCreate(true); }} disabled={!workspace} title="New folder"><FolderPlus size={14}/></button></div> : <Search size={14}/>}</div>
@@ -245,7 +244,7 @@ export default function Home() {
         <section className="editor-area">
           <div className="tabs"><div className="file-tab"><FileCode2 size={14}/> {activeFile ? activeFile.split(/[\\/]/).pop() : "Untitled.cpp"} {dirty && <span className="dirty-dot"/>}</div><div className="editor-actions"><button title="Save file (Ctrl+S)" onClick={() => void saveFile()} disabled={!dirty || !workspace}><Save size={15}/></button><select aria-label="Firmware framework" value={framework} onChange={(event) => setFramework(event.target.value as "arduino" | "esp-idf")}><option value="arduino">Arduino</option><option value="esp-idf">ESP-IDF</option></select><button title="Build firmware" onClick={() => void buildFirmware()} disabled={!workspace || firmwareBusy}><Hammer size={15}/></button><button title="Flash firmware to selected serial port" onClick={() => void flashFirmware()} disabled={!workspace || firmwareBusy}><Play size={15}/></button></div></div>
           <div className="breadcrumbs">{workspace?.name || "Welcome"} <span>/</span> {activeFile || "Untitled.cpp · unsaved buffer"}</div>
-          <div className="editor"><Editor height="100%" language={activeFile.endsWith(".py") ? "python" : activeFile.endsWith(".json") ? "json" : activeFile.endsWith(".md") ? "markdown" : "cpp"} value={editorValue} onMount={() => setEditorReady(true)} onChange={(value) => { setEditorValue(value ?? ""); setDirty(true); }} theme="vs-dark" options={{ minimap: { enabled: false }, fontSize: 13, fontFamily: "Cascadia Code, Consolas, monospace", lineNumbers: "on", scrollBeyondLastLine: false, automaticLayout: true, tabSize: 4, padding: { top: 16 }, renderLineHighlight: "all", readOnly: false }}/>{!editorReady && <div className="editor-state">Starting Monaco editor…</div>}</div>
+          <div className="editor"><Editor height="100%" language={activeFile.endsWith(".py") ? "python" : activeFile.endsWith(".json") ? "json" : activeFile.endsWith(".md") ? "markdown" : "cpp"} value={editorValue} onChange={(value) => { setEditorValue(value ?? ""); setDirty(true); }} theme="vs-dark" options={{ minimap: { enabled: false }, fontSize: 13, fontFamily: "Cascadia Code, Consolas, monospace", lineNumbers: "on", scrollBeyondLastLine: false, automaticLayout: true, tabSize: 4, padding: { top: 16 }, renderLineHighlight: "all", readOnly: false }}/}</div>
           <div className="bottom-panel">
             <div className="panel-tabs">{["PROBLEMS", "OUTPUT", "DEBUG CONSOLE", "SERIAL MONITOR", "TERMINAL"].map((name) => <button key={name} className={bottomTab.toUpperCase() === name ? "current" : ""} onClick={() => setBottomTab(name[0] + name.slice(1).toLowerCase())}>{name}</button>)}<Plus size={14}/><div className="panel-spacer"/><ChevronDown size={14}/><X size={14}/></div>
             {bottomTab === "Terminal" ? <TerminalPanel /> : bottomTab === "Serial monitor" && selectedPort ? <SerialMonitorPanel key={selectedPort} portName={selectedPort} /> : bottomTab === "Output" ? <pre className="firmware-output">{firmwareOutput || "Build and flash output will appear here."}</pre> : <div className="panel-placeholder">{bottomTab === "Problems" ? "No diagnostics provider is connected yet. Compiler diagnostics will appear here after build integration." : bottomTab === "Debug console" ? "The GDB console is available in the JTAG Debug workspace." : bottomTab === "Serial monitor" ? "Select a detected serial port in Board Manager, then choose Monitor." : bottomTab}</div>}
@@ -253,6 +252,7 @@ export default function Home() {
         </section>
       </div>
       <footer className="statusbar"><div><GitBranch size={13}/> main <span>●</span> Workspace</div><div><Usb size={13}/> Serial ports <span>UTF-8</span><span>CRLF</span><span>C++</span><Activity size={13}/> Ready</div></footer>
+      {appNotice && <div className="welcome-toast"><div><strong>APEX</strong><p>{appNotice}</p></div><button onClick={() => setAppNotice("")} aria-label="Dismiss"><X size={14}/></button></div>}
       {showWelcome && <div className="welcome-toast"><div className="welcome-icon"><AppWindow size={18}/></div><div><strong>Welcome to APEX</strong><p>Your embedded development workspace is taking shape.</p></div><button onClick={() => setShowWelcome(false)} aria-label="Dismiss"><X size={14}/></button></div>}
     </main>
   );
