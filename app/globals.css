@@ -104,3 +104,22 @@ button { color: inherit; font: inherit; cursor: pointer; }
 .terminal-view-status .terminal-status { width: 5px; height: 5px; flex-basis: 5px; }
 .terminal-host { height: calc(100% - 20px); min-height: 0; padding: 4px 12px 8px; overflow: hidden; }
 .terminal-host .xterm { height: 100%; }
+
+.port-monitor-button { border: 1px solid #414a35; background: #272e20; color: #d6f36a; padding: 5px 7px; font-size: 10px; }
+.serial-monitor { min-height: 0; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.serial-toolbar { min-height: 34px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 12px; border-bottom: 1px solid #252a2e; }
+.serial-target, .serial-actions { display: flex; align-items: center; gap: 9px; color: #bfc5cb; font-size: 10px; }
+.serial-state { color: #8b949c; }
+.serial-actions label { color: #858d95; }
+.serial-actions select, .serial-actions button { border: 1px solid #343a40; background: #1a1e21; color: #c5cbd1; padding: 4px 7px; font-size: 10px; }
+.serial-actions button { background: #252c20; border-color: #414a35; color: #d6f36a; }
+.serial-actions .serial-clear { background: transparent; color: #aab1b8; border-color: #343a40; }
+.serial-output { min-height: 0; flex: 1; padding: 8px 12px; overflow: hidden; }
+.serial-output .xterm { height: 100%; }
+.serial-input { display: flex; gap: 7px; padding: 8px 12px; border-top: 1px solid #252a2e; }
+.serial-input input { min-width: 0; flex: 1; border: 1px solid #343a40; outline: none; background: #171a1d; color: #dce0e4; padding: 7px 9px; font: 11px "Cascadia Code", Consolas, monospace; }
+.serial-input input:focus { border-color: #6e8044; }
+.serial-input button { border: 1px solid #414a35; background: #272e20; color: #d6f36a; padding: 0 13px; font-size: 10px; }
+.serial-input button:disabled, .serial-actions button:disabled { opacity: .45; cursor: not-allowed; }
+.serial-error { padding: 6px 12px; color: #e19a91; font-size: 10px; border-bottom: 1px solid #382b2a; }
+.panel-placeholder { padding: 18px; color: #858d95; font-size: 11px; }
