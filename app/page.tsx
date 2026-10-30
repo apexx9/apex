@@ -170,12 +170,21 @@ export default function Home() {
     finally { setPortsLoading(false); }
   };
 
+  // Keep the port list in sync with USB hot-plug events. A serial port is not
+  // proof of board identity, but it is the first prerequisite for ESP32 access.
+  useEffect(() => {
+    if (!isTauri()) return;
+    void refreshPorts();
+    const timer = window.setInterval(() => { void refreshPorts(); }, 3000);
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
     <main className="ide">
       <header className="titlebar" data-tauri-drag-region>
         <div className="brand"><div className="brand-mark">A</div><span>APEX</span><span className="brand-sub">EMBEDDED STUDIO</span></div>
         <div className="project-title"><Folder size={14}/> {workspace?.name || "No workspace"} <ChevronDown size={13}/></div>
-        <div className="title-actions"><button className="subtle-button" onClick={() => void createProject()}>New project</button><span className="connection"><span/> No device connected</span><button aria-label="Minimize" onClick={() => isTauri() && void getCurrentWindow().minimize()}>—</button><button aria-label="Maximize" onClick={() => isTauri() && void getCurrentWindow().toggleMaximize()}>□</button><button aria-label="Close" onClick={() => isTauri() && void getCurrentWindow().close()}>×</button></div>
+        <div className="title-actions"><button className="subtle-button" onClick={() => void createProject()}>New project</button><span className="connection"><span/> {ports.length > 0 ? `${ports.length} serial port${ports.length === 1 ? "" : "s"} available` : "No serial ports detected"}</span><button aria-label="Minimize" onClick={() => isTauri() && void getCurrentWindow().minimize()}>—</button><button aria-label="Maximize" onClick={() => isTauri() && void getCurrentWindow().toggleMaximize()}>□</button><button aria-label="Close" onClick={() => isTauri() && void getCurrentWindow().close()}>×</button></div>
       </header>
       <div className="workspace">
         <nav className="activity">
@@ -202,7 +211,7 @@ export default function Home() {
           {activeTab === "boards" && <><BoardPanel framework={framework}/><div className="board-manager">
             <div className="board-intro"><Cpu size={22}/><strong>Detected serial ports</strong><span>Port presence does not confirm board identity. Select a port only after verifying your hardware.</span><button className="subtle-button" onClick={() => void refreshPorts()} disabled={portsLoading}>{portsLoading ? "Scanning…" : "Refresh ports"}</button></div>
             {portsError && <div className="port-error">{portsError}</div>}
-            {ports.length === 0 && !portsLoading && !portsError && <div className="port-empty">No serial ports found.</div>}
+            {ports.length === 0 && !portsLoading && !portsError && <div className="port-empty">No serial ports detected. Check that the board uses a USB data cable and appears under Ports (COM & LPT) in Windows Device Manager. If it appears as an unknown USB device, install the matching USB-to-UART driver (commonly CP210x or CH340), then reconnect and scan again.</div>}
             {ports.map((port) => <div className="port-card" key={port.name}><div className="port-icon"><Usb size={15}/></div><div className="port-details"><strong>{port.name}</strong><span>{port.product || port.manufacturer || port.portType.toUpperCase()}</span>{port.vendorId != null && port.productId != null && <small>VID {port.vendorId.toString(16).padStart(4,"0").toUpperCase()} · PID {port.productId.toString(16).padStart(4,"0").toUpperCase()}</small>}</div><button className="port-monitor-button" onClick={() => { setSelectedPort(port.name); setBottomTab("Serial monitor"); }}>Monitor</button></div>)}
           </div></>}
           {activeTab === "debug" && <DebugPanel/>}
