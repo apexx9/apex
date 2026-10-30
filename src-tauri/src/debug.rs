@@ -62,7 +62,7 @@ pub fn debug_gdb_command(state:State<'_,DebugManager>,command:String)->Result<()
 }
 #[tauri::command]
 pub fn debug_gdb_stop(state:State<'_,DebugManager>)->Result<(),String>{
- state.gdb_input.lock().map_err(|_|"GDB input unavailable")?.take();
  let mut slot=state.gdb.lock().map_err(|_|"Debugger state unavailable")?;
+ state.gdb_input.lock().map_err(|_|"GDB input unavailable")?.take();
  if let Some(mut child)=slot.take(){let _=child.kill();let _=child.wait();}Ok(())
 }
