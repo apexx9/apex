@@ -1,4 +1,5 @@
 mod terminal;
+mod serial;
 
 use terminal::TerminalManager;
 
@@ -29,7 +30,8 @@ pub fn run() {
             terminal::terminal_write,
             terminal::terminal_resize,
             terminal::terminal_stop,
-            terminal::terminal_stop_all
+            terminal::terminal_stop_all,
+            serial::serial_list_ports
         ])
         .run(tauri::generate_context!())
         .expect("error while running APEX");
