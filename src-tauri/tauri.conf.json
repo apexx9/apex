@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "APEX",
+  "version": "0.1.0",
+  "identifier": "tech.apexx9.apex",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:3000",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../out"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "APEX",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 1000,
+        "minHeight": 650,
+        "decorations": false,
+        "backgroundColor": "#101113"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' asset: http://asset.localhost data:; connect-src ipc: http://ipc.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["msi", "nsis"],
+    "category": "DeveloperTool",
+    "shortDescription": "Embedded systems IDE",
+    "longDescription": "A professional embedded systems development environment by Apex."
+  }
+}
