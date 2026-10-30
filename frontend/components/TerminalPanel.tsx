@@ -29,7 +29,11 @@ export function TerminalPanel() {
   };
 
   useEffect(() => {
-    if (sessions.length === 0) addSession("powershell");
+    if (sessions.length === 0) {
+      const id = crypto.randomUUID();
+      setSessions([{ id, shell: "powershell" }]);
+      setActiveId(id);
+    }
   }, [sessions.length]);
 
   return (
