@@ -31,7 +31,7 @@ pub fn run() {
         .expect("error while building APEX")
         .run(|app, event| {
             if let tauri::RunEvent::Exit = event {
-                let _ = app.state::<TerminalManager>();
+                app.state::<TerminalManager>().shutdown();
             }
         });
 }
