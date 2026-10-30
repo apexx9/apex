@@ -123,3 +123,23 @@ button { color: inherit; font: inherit; cursor: pointer; }
 .serial-input button:disabled, .serial-actions button:disabled { opacity: .45; cursor: not-allowed; }
 .serial-error { padding: 6px 12px; color: #e19a91; font-size: 10px; border-bottom: 1px solid #382b2a; }
 .panel-placeholder { padding: 18px; color: #858d95; font-size: 11px; }
+
+.explorer-actions { display: flex; align-items: center; gap: 4px; }
+.explorer-actions button { display: grid; place-items: center; width: 22px; height: 22px; border: 0; background: transparent; color: #8f98a1; }
+.explorer-actions button:hover:not(:disabled) { color: #d6f36a; background: #252a2e; }
+.explorer-actions button:disabled { opacity: .35; cursor: not-allowed; }
+.tree-root { gap: 8px; }
+.tree-item.dynamic { width: 100%; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.tree-item.dynamic:hover { background: #202428; }
+.tree-item.dynamic span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tree-back { display: flex; align-items: center; gap: 7px; width: 100%; padding: 7px 18px; border: 0; background: transparent; color: #9ca5ad; text-align: left; font-size: 10px; }
+.tree-back:hover { color: #d6f36a; }
+.create-entry { display: flex; flex-direction: column; gap: 7px; padding: 10px; border-top: 1px solid #2b3035; border-bottom: 1px solid #2b3035; }
+.create-entry span { color: #b9c0c7; font-size: 10px; }
+.create-entry input { width: 100%; min-width: 0; border: 1px solid #3b434a; outline: none; background: #101315; color: #e1e5e8; padding: 6px 7px; font-size: 11px; }
+.create-entry input:focus { border-color: #81964e; }
+.create-entry div { display: flex; gap: 6px; }
+.create-entry button { border: 1px solid #363d43; background: #24292d; color: #c4cbd1; padding: 4px 7px; font-size: 10px; }
+.create-entry button:first-child { border-color: #414a35; color: #d6f36a; }
+.workspace-error { margin: 8px; padding: 8px; border: 1px solid #533b37; color: #e19a91; font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
+.editor-actions button:disabled { opacity: .35; cursor: not-allowed; }
