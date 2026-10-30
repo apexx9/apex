@@ -2,6 +2,7 @@ mod terminal;
 mod serial;
 
 use terminal::TerminalManager;
+use serial::SerialManager;
 
 #[tauri::command]
 fn app_version() -> &'static str {
@@ -23,6 +24,7 @@ fn terminal_default_cwd() -> Result<String, String> {
 pub fn run() {
     tauri::Builder::default()
         .manage(TerminalManager::default())
+        .manage(SerialManager::default())
         .invoke_handler(tauri::generate_handler![
             app_version,
             terminal_default_cwd,
@@ -31,7 +33,10 @@ pub fn run() {
             terminal::terminal_resize,
             terminal::terminal_stop,
             terminal::terminal_stop_all,
-            serial::serial_list_ports
+            serial::serial_list_ports,
+            serial::serial_start,
+            serial::serial_write,
+            serial::serial_stop
         ])
         .run(tauri::generate_context!())
         .expect("error while running APEX");
