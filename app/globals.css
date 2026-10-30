@@ -33,7 +33,7 @@ button { color: inherit; font: inherit; cursor: pointer; }
 .tree-item svg, .tree-root svg { color: #8d969f; }
 .side-section { margin-top: 20px; padding: 10px 13px; border-top: 1px solid #25292d; color: #858c94; font-size: 10px; font-weight: 600; letter-spacing: .8px; }
 .muted-item { color: #727982; padding-left: 43px !important; }
-.editor-area { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+.editor-area { min-width: 0; min-height: 0; flex: 1; display: flex; flex-direction: column; }
 .tabs { height: 39px; flex: 0 0 39px; display: flex; align-items: stretch; justify-content: space-between; background: #151719; border-bottom: 1px solid #292c30; }
 .file-tab { display: flex; align-items: center; gap: 9px; min-width: 130px; padding: 0 13px; border-right: 1px solid #292c30; border-top: 1px solid #d6f36a; color: #dfe2e5; }
 .file-tab svg:first-child { color: #8da9d7; }
