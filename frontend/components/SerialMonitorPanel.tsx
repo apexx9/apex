@@ -106,7 +106,7 @@ export function SerialMonitorPanel({ portName }: { portName: string }) {
           <select value={baudRate} onChange={(event) => setBaudRate(event.target.value)} disabled={status === "Connected"}>
             {["9600", "19200", "38400", "57600", "74880", "115200", "230400", "460800", "921600"].map((rate) => <option key={rate} value={rate}>{rate}</option>)}
           </select>
-          {status === "Connected" ? <button onClick={() => void disconnect()}>Disconnect</button> : <button onClick={() => void connect()}>Connect</button>}
+          {status === "Connected" || status === "Connection lost" ? <button onClick={() => void disconnect()}>Disconnect</button> : <button onClick={() => void connect()} disabled={status === "Connecting"}>Connect</button>}
           <button className="serial-clear" onClick={() => terminalRef.current?.clear()}>Clear</button>
         </div>
       </div>
