@@ -59,6 +59,7 @@ export default function Home() {
     catch (error) { setWorkspaceError(error instanceof Error ? error.message : String(error)); }
   };
   const openWorkspace = async () => {
+    if (dirty && !window.confirm("Discard unsaved changes and open another workspace?")) return;
     if (!isTauri()) { setWorkspaceError("Opening a workspace requires the APEX desktop runtime."); return; }
     try {
       const opened = await invoke<WorkspaceInfo | null>("workspace_pick");
@@ -68,6 +69,7 @@ export default function Home() {
     } catch (error) { setWorkspaceError(error instanceof Error ? error.message : String(error)); }
   };
   const openEntry = async (entry: WorkspaceEntry) => {
+    if (!entry.isDirectory && dirty && !window.confirm("Discard unsaved changes in the current file?")) return;
     if (entry.isDirectory) { setCurrentPath(entry.relativePath); await refreshWorkspace(entry.relativePath); return; }
     try {
       const value = await invoke<string>("workspace_read_file", { relativePath: entry.relativePath });
@@ -139,7 +141,7 @@ export default function Home() {
             {workspace && entries.length === 0 && <div className="empty-state"><span>This folder is empty.</span></div>}
           </>}
           {activeTab === "boards" && <div className="board-manager">
-            <div className="board-intro"><Cpu size={22}/><strong>Connected serial ports</strong><span>Port presence does not confirm board identity. Select a port only after verifying your hardware.</span><button className="subtle-button" onClick={() => void refreshPorts()} disabled={portsLoading}>{portsLoading ? "Scanning…" : "Refresh ports"}</button></div>
+            <div className="board-intro"><Cpu size={22}/><strong>Detected serial ports</strong><span>Port presence does not confirm board identity. Select a port only after verifying your hardware.</span><button className="subtle-button" onClick={() => void refreshPorts()} disabled={portsLoading}>{portsLoading ? "Scanning…" : "Refresh ports"}</button></div>
             {portsError && <div className="port-error">{portsError}</div>}
             {ports.length === 0 && !portsLoading && !portsError && <div className="port-empty">No serial ports found.</div>}
             {ports.map((port) => <div className="port-card" key={port.name}><div className="port-icon"><Usb size={15}/></div><div className="port-details"><strong>{port.name}</strong><span>{port.product || port.manufacturer || port.portType.toUpperCase()}</span>{port.vendorId != null && port.productId != null && <small>VID {port.vendorId.toString(16).padStart(4,"0").toUpperCase()} · PID {port.productId.toString(16).padStart(4,"0").toUpperCase()}</small>}</div><button className="port-monitor-button" onClick={() => { setSelectedPort(port.name); setBottomTab("Serial monitor"); }}>Monitor</button></div>)}
@@ -156,7 +158,7 @@ export default function Home() {
           </div>
         </section>
       </div>
-      <footer className="statusbar"><div><GitBranch size={13}/> main <span>●</span> Workspace</div><div><Usb size={13}/> No serial port <span>UTF-8</span><span>CRLF</span><span>C++</span><Activity size={13}/> Ready</div></footer>
+      <footer className="statusbar"><div><GitBranch size={13}/> main <span>●</span> Workspace</div><div><Usb size={13}/> Serial ports <span>UTF-8</span><span>CRLF</span><span>C++</span><Activity size={13}/> Ready</div></footer>
       {showWelcome && <div className="welcome-toast"><div className="welcome-icon"><AppWindow size={18}/></div><div><strong>Welcome to APEX</strong><p>Your embedded development workspace is taking shape.</p></div><button onClick={() => setShowWelcome(false)} aria-label="Dismiss"><X size={14}/></button></div>}
     </main>
   );
