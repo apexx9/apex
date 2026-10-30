@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "APEX",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "identifier": "tech.apexx9.apex",
   "build": {
     "beforeDevCommand": "pnpm dev",
@@ -32,10 +32,29 @@
       "nsis"
     ],
     "category": "DeveloperTool",
-    "shortDescription": "Embedded systems IDE",
-    "longDescription": "A professional embedded systems development environment by Apex.",
+    "shortDescription": "Embedded systems IDE for ESP32 and other microcontrollers",
+    "longDescription": "APEX is an embedded systems development environment by Apex. Create and manage firmware projects, edit code, use integrated terminals and serial tools, inspect board capabilities, manage toolchains and build and flash supported microcontroller projects.",
     "icon": [
       "icons/icon.ico"
-    ]
+    ],
+    "publisher": "Apex",
+    "copyright": "Copyright © 2026 Apex",
+    "homepage": "https://github.com/apexx9/apex",
+    "windows": {
+      "allowDowngrades": false,
+      "nsis": {
+        "installMode": "currentUser",
+        "displayLanguageSelector": false,
+        "languages": [
+          "English"
+        ],
+        "startMenuFolder": "APEX",
+        "compression": "lzma"
+      },
+      "wix": {
+        "upgradeCode": "e9e5dfc6-177b-5751-b786-9afad066751a",
+        "language": "en-US"
+      }
+    }
   }
 }
