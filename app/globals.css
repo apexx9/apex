@@ -177,3 +177,23 @@ button { color: inherit; font: inherit; cursor: pointer; }
 .editor-actions select { height: 25px; margin: 0 5px; padding: 0 6px; border: 1px solid #343a40; background: #1a1e21; color: #bfc6cd; font-size: 10px; outline: none; }
 .editor-actions button:hover:not(:disabled) { color: #d6f36a; background: #242a20; }
 .firmware-output { min-height: 0; flex: 1; margin: 0; padding: 10px 14px; overflow: auto; color: #bfc7ce; background: #111315; font: 10px/1.65 "Cascadia Code", Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.component-panel { min-height:0; display:flex; flex-direction:column; gap:11px; padding:14px 12px; overflow:auto; }
+.component-header { display:flex; align-items:center; gap:9px; color:#d6f36a; }
+.component-header div { display:flex; flex-direction:column; gap:3px; }
+.component-header strong { color:#d9dee3; font-size:11px; }
+.component-header span,.component-description,.component-actions span,.component-note { color:#858e97; font-size:9px; line-height:1.6; }
+.component-description { margin:0; }
+.component-label { color:#aeb6be; font-size:10px; }
+.component-search { display:flex; gap:6px; }
+.component-search input { min-width:0; flex:1; border:1px solid #343a40; outline:none; background:#111416; color:#e0e4e8; padding:7px 8px; font:10px "Cascadia Code",Consolas,monospace; }
+.component-search input:focus { border-color:#72864a; }
+.component-search button,.component-actions button { display:flex; align-items:center; gap:6px; border:1px solid #414a35; background:#252c20; color:#d6f36a; padding:6px 9px; font-size:10px; }
+.component-search button:disabled,.component-actions button:disabled { opacity:.4; cursor:not-allowed; }
+.component-actions { display:flex; align-items:center; flex-wrap:wrap; gap:9px; }
+.component-output { min-height:110px; border:1px solid #2e3439; background:#111416; }
+.component-output > div { padding:7px 9px; border-bottom:1px solid #2b3136; color:#87919a; font:9px "Cascadia Code",Consolas,monospace; }
+.component-output pre { margin:0; padding:9px; max-height:220px; overflow:auto; color:#bdc5cc; white-space:pre-wrap; overflow-wrap:anywhere; font:10px/1.6 "Cascadia Code",Consolas,monospace; }
+.component-error { display:flex; align-items:flex-start; gap:6px; color:#e19a91; font-size:10px; line-height:1.5; }
+.component-note { margin:0; }
+.component-note code { color:#d6f36a; }

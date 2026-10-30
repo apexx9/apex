@@ -33,6 +33,6 @@ export function ComponentPanel({ framework }: { framework: "arduino" | "esp-idf"
     <div className="component-actions"><button onClick={()=>void run("install")} disabled={busy||!query.trim()}><Download size={13}/>{framework==="esp-idf"?"Add dependency":"Install library"}</button><span>Requires the selected package manager on PATH.</span></div>
     {error&&<div className="component-error"><AlertCircle size={13}/>{error}</div>}
     <div className="component-output"><div>{command||"REGISTRY OUTPUT"}</div><pre>{output||"Search for a package or enter its exact name to install it into the active workspace."}</pre></div>
-    {framework==="esp-idf"&&<p className="component-note">ESP-IDF dependency search opens through the registry website; APEX runs <code>idf.py add-dependency</code> for the identifier you provide.</p>}
+    {framework==="esp-idf"&&<p className="component-note">Find the exact component identifier in the Espressif Component Registry; APEX runs <code>idf.py add-dependency</code> for the identifier you provide.</p>}
   </section>;
 }
