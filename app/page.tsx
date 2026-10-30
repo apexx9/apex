@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { isTauri } from "@tauri-apps/api/core";
+import { invoke, isTauri } from "@tauri-apps/api/core";
 import Editor from "@monaco-editor/react";
 import { TerminalPanel } from "@/frontend/components/TerminalPanel";
 import {
@@ -31,11 +31,22 @@ void loop() {
 `;
 
 type Tab = "explorer" | "boards" | "components";
+type SerialPort = { name: string; portType: string; manufacturer?: string | null; product?: string | null; serialNumber?: string | null; vendorId?: number | null; productId?: number | null };
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("explorer");
   const [bottomTab, setBottomTab] = useState("Terminal");
   const [showWelcome, setShowWelcome] = useState(true);
+  const [ports, setPorts] = useState<SerialPort[]>([]);
+  const [portsError, setPortsError] = useState("");
+  const [portsLoading, setPortsLoading] = useState(false);
+  const refreshPorts = async () => {
+    if (!isTauri()) { setPortsError("Serial discovery requires the APEX desktop runtime."); return; }
+    setPortsLoading(true); setPortsError("");
+    try { setPorts(await invoke<SerialPort[]>("serial_list_ports")); }
+    catch (error) { setPortsError(error instanceof Error ? error.message : String(error)); }
+    finally { setPortsLoading(false); }
+  };
 
   return (
     <main className="ide">
@@ -47,7 +58,7 @@ export default function Home() {
       <div className="workspace">
         <nav className="activity">
           <button className={activeTab === "explorer" ? "selected" : ""} onClick={() => setActiveTab("explorer")} title="Explorer"><ListTree/></button>
-          <button className={activeTab === "boards" ? "selected" : ""} onClick={() => setActiveTab("boards")} title="Boards"><Cpu/></button>
+          <button className={activeTab === "boards" ? "selected" : ""} onClick={() => { setActiveTab("boards"); void refreshPorts(); }} title="Boards"><Cpu/></button>
           <button className={activeTab === "components" ? "selected" : ""} onClick={() => setActiveTab("components")} title="Components"><Blocks/></button>
           <div className="activity-spacer"/>
           <button title="Settings"><Settings2/></button>
@@ -65,7 +76,12 @@ export default function Home() {
             <div className="side-section">OUTLINE</div>
             <div className="tree-item indent muted-item">setup()</div><div className="tree-item indent muted-item">loop()</div>
           </>}
-          {activeTab === "boards" && <div className="empty-state"><Cpu size={22}/><strong>No board detected</strong><span>Connect a supported development board to begin identification.</span><button className="subtle-button">Refresh ports</button></div>}
+          {activeTab === "boards" && <div className="board-manager">
+            <div className="board-intro"><Cpu size={22}/><strong>Connected serial ports</strong><span>Port presence does not confirm board identity. Select a port only after verifying your hardware.</span><button className="subtle-button" onClick={() => void refreshPorts()} disabled={portsLoading}>{portsLoading ? "Scanning…" : "Refresh ports"}</button></div>
+            {portsError && <div className="port-error">{portsError}</div>}
+            {ports.length === 0 && !portsLoading && !portsError && <div className="port-empty">No serial ports found.</div>}
+            {ports.map((port) => <div className="port-card" key={port.name}><div className="port-icon"><Usb size={15}/></div><div className="port-details"><strong>{port.name}</strong><span>{port.product || port.manufacturer || port.portType.toUpperCase()}</span>{port.vendorId != null && port.productId != null && <small>VID {port.vendorId.toString(16).padStart(4,"0").toUpperCase()} · PID {port.productId.toString(16).padStart(4,"0").toUpperCase()}</small>}</div><span className="port-tag">PORT</span></div>)}
+          </div>}
           {activeTab === "components" && <div className="empty-state"><Blocks size={22}/><strong>Component manager</strong><span>Install and manage project dependencies from supported registries.</span></div>}
         </aside>
         <section className="editor-area">
