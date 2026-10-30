@@ -76,3 +76,17 @@ button { color: inherit; font: inherit; cursor: pointer; }
 .terminal-host { min-height: 0; flex: 1; padding: 8px 12px; overflow: hidden; }
 .terminal-host .xterm { height: 100%; }
 .terminal-host .xterm-viewport { overflow-y: auto !important; }
+
+.board-manager { padding: 18px 13px; display: flex; flex-direction: column; gap: 10px; }
+.board-intro { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; color: #858d95; line-height: 1.55; }
+.board-intro strong { color: #d3d8dd; font-size: 12px; }
+.board-intro span { font-size: 11px; }
+.board-intro button:disabled { opacity: .55; cursor: wait; }
+.port-empty, .port-error { padding: 12px 9px; border: 1px solid #2b3035; color: #858d95; font-size: 11px; }
+.port-error { color: #df9b92; }
+.port-card { display: flex; align-items: center; gap: 9px; padding: 10px 8px; border: 1px solid #30363b; background: #1a1d20; }
+.port-icon { display: grid; place-items: center; width: 28px; height: 28px; color: #d6f36a; background: #2a3020; }
+.port-details { min-width: 0; display: flex; flex: 1; flex-direction: column; gap: 3px; }
+.port-details strong { color: #dce0e4; font-size: 11px; }
+.port-details span, .port-details small { overflow: hidden; color: #858d95; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.port-tag { border: 1px solid #414a35; padding: 2px 4px; color: #b9d780; font-size: 9px; letter-spacing: .6px; }
