@@ -63,3 +63,16 @@ button { color: inherit; font: inherit; cursor: pointer; }
 .welcome-toast strong { font-size: 12px; }
 .welcome-toast p { margin: 5px 0 0; color: #929aa2; font-size: 11px; line-height: 1.5; }
 .welcome-toast button { margin-left: auto; border: 0; background: transparent; color: #858c94; }
+
+.terminal-panel { min-height: 0; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.terminal-toolbar { height: 31px; flex: 0 0 31px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; border-bottom: 1px solid #22272b; color: #8e969e; font-size: 10px; }
+.terminal-session, .terminal-controls { min-width: 0; display: flex; align-items: center; gap: 9px; }
+.terminal-status { width: 6px; height: 6px; flex: 0 0 6px; border-radius: 50%; background: #777f88; }
+.terminal-status.online { background: #a9cf6a; box-shadow: 0 0 7px #a9cf6a66; }
+.terminal-cwd { overflow: hidden; max-width: 360px; text-overflow: ellipsis; white-space: nowrap; color: #737c85; }
+.terminal-controls select { border: 1px solid #30363c; background: #191d20; color: #aeb5bc; padding: 3px 6px; font-size: 10px; }
+.terminal-state { color: #89919a; }
+.terminal-error { color: #d98e87; }
+.terminal-host { min-height: 0; flex: 1; padding: 8px 12px; overflow: hidden; }
+.terminal-host .xterm { height: 100%; }
+.terminal-host .xterm-viewport { overflow-y: auto !important; }
