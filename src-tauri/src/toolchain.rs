@@ -58,12 +58,13 @@ pub fn toolchain_scan() -> Vec<ToolchainItem> {
     definitions.into_iter().map(|(id, label, executable, required_for)| {
         let path = locate(executable);
         let version = path.as_ref().and_then(|path| read_version(path, executable));
+        let installed = path.is_some();
         ToolchainItem {
             id,
             label,
             executable: path.map(|path| path.to_string_lossy().into_owned()),
             version,
-            installed: path.is_some(),
+            installed,
             required_for,
         }
     }).collect()
