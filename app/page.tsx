@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Editor from "@monaco-editor/react";
-import { TerminalPanel } from "@/components/TerminalPanel";
+import { TerminalPanel } from "@/frontend/components/TerminalPanel";
 import {
   Activity, AppWindow, Blocks, ChevronDown, ChevronRight, CircleHelp,
   Code2, Cpu, FileCode2, Folder, FolderOpen, GitBranch, Hammer, Layers3,
