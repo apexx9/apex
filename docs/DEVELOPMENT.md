@@ -53,7 +53,7 @@ The first board profile describes classic ESP32 silicon capabilities only. GPIO 
 
 ## Debugging
 
-The JTAG panel starts/stops OpenOCD using user-selected interface and target config files. Install the official ESP-IDF toolchain and select a matching GDB executable. OpenOCD server output is streamed into APEX; full GDB interactive controls are not yet available.
+The JTAG panel starts/stops OpenOCD using user-selected interface and target config files. Install the official ESP-IDF toolchain and select a matching GDB executable. OpenOCD server output is streamed into APEX; GDB can be started in MI2 mode against a selected ELF, and MI commands can be sent from the debug panel. Dedicated breakpoint and variable-inspection views are not yet implemented.
 
 ## Hardware acceptance checklist
 

@@ -26,7 +26,7 @@ APEX is a native desktop engineering environment for embedded firmware, robotics
 - Build and flash require the selected framework's toolchain installed and initialized in the environment from which APEX is launched.
 - Guided winget installation covers selected prerequisites only. ESP-IDF, its compiler toolchains, OpenOCD and GDB should be installed with Espressif’s official Windows installer; APEX does not silently download or execute third-party installers.
 - The GPIO explorer is a silicon-capability reference, not a board schematic. Physical header positions remain unverified until the exact board revision is identified. Peripheral code generation produces starter snippets/configuration, not a live hardware test or a complete driver implementation for every bus.
-- The OpenOCD panel manages the server process and streams logs; GDB probing checks the executable. A full interactive GDB console, ELF loading, breakpoints and variable inspection are not yet implemented.
+- The OpenOCD panel manages the server process and streams logs; GDB probing checks the executable. GDB MI2 sessions can be started against a selected ELF, receive streamed output and accept MI commands. Dedicated breakpoint and variable-inspection controls are not yet implemented.
 - ESP-IDF component search directs users to the official registry and accepts the exact component identifier; it does not yet query registry search APIs directly. Arduino CLI libraries install into the user library environment. PlatformIO packages are installed against the active project.
 - No physical board has been validated as part of CI. The first hardware acceptance pass must be performed with a real ESP32 connected.
 
