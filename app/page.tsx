@@ -11,11 +11,12 @@ const Editor = dynamic(() => import("@monaco-editor/react"), {
 });
 import { TerminalPanel } from "@/frontend/components/TerminalPanel";
 import { SerialMonitorPanel } from "@/frontend/components/SerialMonitorPanel";
+import { ToolchainPanel } from "@/frontend/components/ToolchainPanel";
 import {
   Activity, AppWindow, Blocks, ChevronDown, ChevronRight, CircleHelp,
   Code2, Cpu, FileCode2, Folder, FolderOpen, GitBranch, Hammer, Layers3,
   ListTree, Monitor, Play, Plus, Search, Settings2, TerminalSquare,
-  Usb, X, Save, FilePlus, FolderPlus, ArrowLeft,
+  Usb, X, Save, FilePlus, FolderPlus, ArrowLeft, Wrench,
 } from "lucide-react";
 
 const source = `#include <Arduino.h>
@@ -36,7 +37,7 @@ void loop() {
 }
 `;
 
-type Tab = "explorer" | "boards" | "components";
+type Tab = "explorer" | "boards" | "components" | "tools";
 type SerialPort = { name: string; portType: string; manufacturer?: string | null; product?: string | null; serialNumber?: string | null; vendorId?: number | null; productId?: number | null };
 type WorkspaceInfo = { name: string; path: string };
 type WorkspaceEntry = { name: string; relativePath: string; isDirectory: boolean; size: number | null };
@@ -130,12 +131,13 @@ export default function Home() {
           <button className={activeTab === "explorer" ? "selected" : ""} onClick={() => setActiveTab("explorer")} title="Explorer"><ListTree/></button>
           <button className={activeTab === "boards" ? "selected" : ""} onClick={() => { setActiveTab("boards"); void refreshPorts(); }} title="Boards"><Cpu/></button>
           <button className={activeTab === "components" ? "selected" : ""} onClick={() => setActiveTab("components")} title="Components"><Blocks/></button>
+          <button className={activeTab === "tools" ? "selected" : ""} onClick={() => setActiveTab("tools")} title="Toolchains"><Wrench/></button>
           <div className="activity-spacer"/>
           <button title="Settings"><Settings2/></button>
           <button title="Help"><CircleHelp/></button>
         </nav>
         <aside className="sidebar">
-          <div className="side-heading"><span>{activeTab === "explorer" ? "EXPLORER" : activeTab === "boards" ? "BOARD MANAGER" : "COMPONENTS"}</span>{activeTab === "explorer" ? <div className="explorer-actions"><button onClick={() => void openWorkspace()} title="Open workspace"><FolderOpen size={14}/></button><button onClick={() => { setCreateKind("file"); setShowCreate(true); }} disabled={!workspace} title="New file"><FilePlus size={14}/></button><button onClick={() => { setCreateKind("directory"); setShowCreate(true); }} disabled={!workspace} title="New folder"><FolderPlus size={14}/></button></div> : <Search size={14}/>}</div>
+          <div className="side-heading"><span>{activeTab === "explorer" ? "EXPLORER" : activeTab === "boards" ? "BOARD MANAGER" : activeTab === "tools" ? "TOOLCHAINS" : "COMPONENTS"}</span>{activeTab === "explorer" ? <div className="explorer-actions"><button onClick={() => void openWorkspace()} title="Open workspace"><FolderOpen size={14}/></button><button onClick={() => { setCreateKind("file"); setShowCreate(true); }} disabled={!workspace} title="New file"><FilePlus size={14}/></button><button onClick={() => { setCreateKind("directory"); setShowCreate(true); }} disabled={!workspace} title="New folder"><FolderPlus size={14}/></button></div> : <Search size={14}/>}</div>
           {activeTab === "explorer" && <>
             <div className="tree-root"><FolderOpen size={15}/> {workspace?.name || "NO WORKSPACE"}</div>
             {workspace && currentPath && <button className="tree-back" onClick={() => { const parent = currentPath.replace(/[\\/][^\\/]+$/, ""); setCurrentPath(parent); void refreshWorkspace(parent); }}><ArrowLeft size={13}/> Back</button>}
@@ -151,6 +153,7 @@ export default function Home() {
             {ports.length === 0 && !portsLoading && !portsError && <div className="port-empty">No serial ports found.</div>}
             {ports.map((port) => <div className="port-card" key={port.name}><div className="port-icon"><Usb size={15}/></div><div className="port-details"><strong>{port.name}</strong><span>{port.product || port.manufacturer || port.portType.toUpperCase()}</span>{port.vendorId != null && port.productId != null && <small>VID {port.vendorId.toString(16).padStart(4,"0").toUpperCase()} · PID {port.productId.toString(16).padStart(4,"0").toUpperCase()}</small>}</div><button className="port-monitor-button" onClick={() => { setSelectedPort(port.name); setBottomTab("Serial monitor"); }}>Monitor</button></div>)}
           </div>}
+          {activeTab === "tools" && <ToolchainPanel />}
           {activeTab === "components" && <div className="empty-state"><Blocks size={22}/><strong>Component manager</strong><span>Install and manage project dependencies from supported registries.</span></div>}
         </aside>
         <section className="editor-area">
