@@ -18,7 +18,7 @@ export function ComponentPanel({ framework }: { framework: "arduino" | "esp-idf"
     if (!query.trim()) return;
     setBusy(true); setError(""); setOutput(action==="search"?"Searching registry…":"Installing dependency…");
     try {
-      const result=await invoke<Result>(action==="search"?"component_search":"component_install",{framework:selectedFramework,query});
+      const result=await invoke<Result>(action==="search"?"component_search":"component_install",action==="search"?{framework:selectedFramework,query}:{framework:selectedFramework,package:query});
       setCommand(result.command);
       setOutput(result.output || (result.success?"Command completed.":"Command failed."));
       if (!result.success) setError("The package manager returned a non-zero exit status.");
