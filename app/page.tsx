@@ -9,8 +9,14 @@ const Editor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => <div className="editor-loading">Loading code editor…</div>,
 });
-import { TerminalPanel } from "@/frontend/components/TerminalPanel";
-import { SerialMonitorPanel } from "@/frontend/components/SerialMonitorPanel";
+const TerminalPanel = dynamic(() => import("@/frontend/components/TerminalPanel").then((module) => module.TerminalPanel), {
+  ssr: false,
+  loading: () => <div className="panel-placeholder">Loading terminal…</div>,
+});
+const SerialMonitorPanel = dynamic(() => import("@/frontend/components/SerialMonitorPanel").then((module) => module.SerialMonitorPanel), {
+  ssr: false,
+  loading: () => <div className="panel-placeholder">Loading serial monitor…</div>,
+});
 import { ToolchainPanel } from "@/frontend/components/ToolchainPanel";
 import {
   Activity, AppWindow, Blocks, ChevronDown, ChevronRight, CircleHelp,
