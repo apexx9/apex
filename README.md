@@ -1,46 +1,47 @@
 # APEX
 
-**A professional embedded systems IDE by Apex.**
+**A Windows-first embedded systems IDE by Apex.**
 
-APEX is a Windows-first desktop engineering environment for embedded firmware, robotics and electronics. The initial release focuses on a dependable desktop foundation and ESP32 development, with a modular architecture for future platforms.
+APEX is a native desktop engineering environment for embedded firmware, robotics and electronics. The first target is the Espressif ESP32 family. The application uses Tauri 2, Rust, Next.js, React, TypeScript and Monaco Editor.
 
-## Status
+## Current implementation
 
-APEX is in active development. Phase 1 establishes the Tauri 2 + Rust desktop shell, static-export Next.js frontend, editor workspace, project explorer, terminal foundation, onboarding and settings. Hardware workflows will be added incrementally and will only report capabilities that are actually detected or tested.
+- Native Windows desktop shell with a custom dark engineering workspace.
+- Monaco editor with workspace file browsing, creation and saving.
+- Integrated PowerShell / Command Prompt terminal backed by a native PTY.
+- Serial port discovery, serial monitor, baud-rate selection and transmit input.
+- Toolchain discovery for Python, CMake, Ninja, Git, ESP-IDF-related tools, Xtensa/RISC-V compilers and debuggers, Arduino CLI and PlatformIO.
+- New-project templates for Arduino ESP32 and ESP-IDF.
+- Native firmware build and flash commands for Arduino CLI and ESP-IDF.
+- Windows MSI and NSIS packaging through GitHub Actions.
+
+## Important boundaries
+
+- A detected COM port does not identify a board. Verify the exact module, USB bridge, flash configuration and pinout before selecting pins or flashing.
+- The generic ESP32 template targets `esp32` / `esp32:esp32:esp32`. The sample GPIO 2 LED pin is illustrative and must be checked against the actual board.
+- Build and flash require the selected framework's toolchain installed and initialized in the environment from which APEX is launched.
+- APEX does not yet automatically install ESP-IDF or Arduino cores.
+- Peripheral configuration, pin-conflict analysis, live GPIO/I2C/SPI diagnostics, OpenOCD/GDB session management and component registry UI are still under development.
+- No physical board has been validated as part of CI. The first hardware acceptance pass must be performed with a real ESP32 connected.
 
 ## Architecture
 
-- `app/` — Next.js App Router application.
-- `frontend/components/` — reusable React workspace components.
-- `src-tauri/` — Tauri 2 desktop shell and native Rust services.
-- `docs/` — architecture, setup and implementation notes.
-- `tests/` — acceptance and integration test plans.
+- `app/` — Next.js application and IDE shell.
+- `frontend/components/` — editor panels, terminal, serial monitor and toolchain UI.
+- `src-tauri/` — Tauri shell and native Rust process, filesystem, serial and firmware services.
+- `docs/` — setup and acceptance guidance.
 
-## Development prerequisites
+## Development
 
-- Node.js 20+
-- pnpm 9+
-- Rust stable toolchain
-- Windows 10/11 with Microsoft C++ Build Tools and WebView2 Runtime
-- Tauri 2 prerequisites: https://v2.tauri.app/start/prerequisites/
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
-## Getting started
+## Principles
 
-```powershell
-corepack enable
-pnpm install
-pnpm tauri dev
-```
-
-See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for setup details.
-
-## Project principles
-
-1. Native hardware and process functionality belongs in Rust, not the browser UI.
-2. Never fake a successful build, flash, device scan or measurement.
-3. Destructive operations require explicit confirmation.
-4. Platform and board capabilities must be backed by board metadata and actual detection.
-5. Prefer complete, tested workflows over superficial feature breadth.
+1. Hardware status must come from actual detection or firmware diagnostics.
+2. Never report a successful build, flash, measurement or debugger session without a successful native result.
+3. Invoke external tools with argument arrays, not shell-concatenated command strings.
+4. Keep filesystem operations inside the selected workspace.
+5. Clearly distinguish verified board metadata from generic or user-supplied assumptions.
 
 ## License
 
