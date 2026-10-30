@@ -3,7 +3,9 @@ mod serial;
 mod workspace;
 mod toolchain;
 mod firmware;
-mod components;\nmod hardware;\nmod debug;
+mod components;
+mod hardware;
+mod debug;
 
 use terminal::TerminalManager;
 use serial::SerialManager;
@@ -30,7 +32,8 @@ pub fn run() {
     tauri::Builder::default()
         .manage(TerminalManager::default())
         .manage(SerialManager::default())
-        .manage(WorkspaceManager::default())\n        .manage(debug::DebugManager::default())
+        .manage(WorkspaceManager::default())
+        .manage(debug::DebugManager::default())
         .invoke_handler(tauri::generate_handler![
             app_version,
             terminal_default_cwd,
@@ -51,7 +54,13 @@ pub fn run() {
             workspace::workspace_write_file,
             workspace::workspace_create_file,
             workspace::workspace_create_directory,
-            toolchain::toolchain_scan,\n            toolchain::toolchain_install,\n            hardware::board_profiles,\n            hardware::peripheral_generate,\n            debug::debug_openocd_start,\n            debug::debug_openocd_stop,\n            debug::debug_gdb_probe,
+            toolchain::toolchain_scan,
+            toolchain::toolchain_install,
+            hardware::board_profiles,
+            hardware::peripheral_generate,
+            debug::debug_openocd_start,
+            debug::debug_openocd_stop,
+            debug::debug_gdb_probe,
             firmware::firmware_create_project,
             firmware::firmware_build,
             firmware::firmware_flash,
