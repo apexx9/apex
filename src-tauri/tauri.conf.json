@@ -27,9 +27,15 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["msi", "nsis"],
+    "targets": [
+      "msi",
+      "nsis"
+    ],
     "category": "DeveloperTool",
     "shortDescription": "Embedded systems IDE",
-    "longDescription": "A professional embedded systems development environment by Apex."
+    "longDescription": "A professional embedded systems development environment by Apex.",
+    "icon": [
+      "icons/icon.ico"
+    ]
   }
 }
